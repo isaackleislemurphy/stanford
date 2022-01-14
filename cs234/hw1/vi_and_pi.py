@@ -49,6 +49,39 @@ the parameters P, nS, nA, gamma are defined as follows:
 		Discount factor. Number in range [0, 1)
 """
 
+def bellman_operator_single(P, s, a, value_func, gamma):
+	"""
+	Applies a bellman backup for a given state, action, and value function.
+
+	Parameters
+	----------
+	P:
+		defined at beginning of file
+	s: int
+		The state you are in currently
+	a: int
+		The action you wish to take and evaluate
+	value_func: np.array[nS]
+		The current value function to be used in the Bellman backup
+	gamma: float
+		Discount in rewards
+	Returns
+	-------
+	value_function: float
+		The Q(s,a) result
+
+	"""
+	result = 0.
+	for (trans_prob, s_, r, _) in P[s][a]:
+		result += (
+			trans_prob * (
+				r +
+				gamma * value_func[s_]
+			)
+		)
+	return result
+
+
 
 def policy_evaluation(P, nS, nA, policy, gamma=0.9, tol=1e-3, verbose=False):
 	"""Evaluate the value function from a given policy.
@@ -83,23 +116,15 @@ def policy_evaluation(P, nS, nA, policy, gamma=0.9, tol=1e-3, verbose=False):
 		# init a new value function
 		value_function_new = value_function_old.copy()
 		for s in range(nS): # iter over states, per procedure
-			# extract the deterministic action we're taking
-			act = policy[s] # infinite horizon, so det.
-			###############################################################################
-			# iterate over policies to get reward of taking action, i.e. E[r(s, a)]
-			r_sa = np.sum([item[2] for item in P[s][act]]) # expected reward
-			# iterate over next states after action, and stuff inside the final Bellman sum
-			weighted_trans_probs = 0.
-			for s_, (trans_prob, to_state, _, _) in enumerate(P[s][act]):
-				weighted_trans_probs += (
-					gamma *
-					trans_prob *
-					value_function_old[to_state]
-				)
-			###############################################################################
-			# print(f"{s} || {weighted_trans_probs}")
-			# update value function
-			value_function_new[s] = r_sa + weighted_trans_probs
+			# extract the action we wish to take
+			action = policy[s] # infinite horizon, so det.
+			value_function_new[s] = bellman_operator_single(
+				P=P,
+				s=s,
+				a=action,
+				value_func=value_function_old,
+				gamma=gamma
+			)
 		# update counter
 		k += 1
 		if np.max(value_function_new - value_function_old) < tol:
@@ -107,9 +132,6 @@ def policy_evaluation(P, nS, nA, policy, gamma=0.9, tol=1e-3, verbose=False):
 		value_function_old = value_function_new.copy()
 	value_function = value_function_new
 	############################
-	# print("*" * 60)
-	# print("value:")
-	# print(value_function)
 	return value_function
 
 
@@ -141,25 +163,19 @@ def policy_improvement(P, nS, nA, value_from_policy, policy, gamma=0.9):
 
 	for s in range(nS):
 		Q_sa_vec = np.zeros(nA)
-		for act in range(nA):
-			###############################################################################
-			# iterate over policies to get reward of taking action, i.e. E[r(s, a)]
-			r_sa = np.sum([item[2] for item in P[s][act]]) # expected reward
-			# iterate over next states after action, and stuff inside the final Bellman sum
-			weighted_trans_probs = 0.
-			for s_, (trans_prob, to_state, _, _) in enumerate(P[s][act]):
-				weighted_trans_probs += (
-					gamma *
-					trans_prob *
-					value_from_policy[to_state]
-				)
-			###############################################################################
-			Q_sa_vec[act] = r_sa + weighted_trans_probs
-		new_policy[s] = np.where(Q_sa_vec == np.max(Q_sa_vec))[0][0]
+		for action in range(nA):
+
+			Q_sa_vec[action] = bellman_operator_single(
+				P=P,
+				s=s,
+				a=action,
+				value_func=value_from_policy,
+				gamma=gamma
+			)
+
+		# new_policy[s] = np.where(Q_sa_vec == np.max(Q_sa_vec))[0][0]
+		new_policy[s] = np.argmax(Q_sa_vec)
 	############################
-	# print("policy:")
-	# print(new_policy)
-	# print("*" * 60)
 	return new_policy
 
 
@@ -236,20 +252,14 @@ def value_iteration(P, nS, nA, gamma=0.9, tol=1e-3):
 	while True:
 		for s in range(nS):
 			value_candidate = np.zeros(nA)
-			for act in range(nA):
-				###############################################################################
-				# iterate over policies to get reward of taking action, i.e. E[r(s, a)]
-				r_sa = np.sum([item[2] for item in P[s][act]]) # expected reward
-				# iterate over next states after action, and stuff inside the final Bellman sum
-				weighted_trans_probs = 0.
-				for s_, (trans_prob, to_state, _, _) in enumerate(P[s][act]):
-					weighted_trans_probs += (
-						gamma *
-						trans_prob *
-						value_function[to_state]
-					)
-				###############################################################################
-				value_candidate[act] = r_sa + weighted_trans_probs
+			for action in range(nA):
+				value_candidate[action] = bellman_operator_single(
+					P=P,
+					s=s,
+					a=action,
+					value_func=value_function,
+					gamma=gamma
+				)
 			# keep that one which does best
 			value_function[s] = value_candidate[np.argmax(value_candidate)]
 		if np.max(
@@ -315,7 +325,7 @@ if __name__ == "__main__":
 	V_pi, p_pi = policy_iteration(env.P, env.nS, env.nA, gamma=0.9, tol=1e-3)
 	render_single(env, p_pi, 100)
 
-	print("\n" + "-" * 25 + "\nBeginning Value Iteration\n" + "-" * 25)
+	# print("\n" + "-" * 25 + "\nBeginning Value Iteration\n" + "-" * 25)
 
 	V_vi, p_vi = value_iteration(env.P, env.nS, env.nA, gamma=0.9, tol=1e-3)
 	render_single(env, p_vi, 100)
