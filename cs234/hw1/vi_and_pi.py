@@ -74,8 +74,11 @@ def bellman_operator_single(P, s, a, value_func, gamma):
 	result = 0.
 	for (trans_prob, s_, r, _) in P[s][a]:
 		result += (
+			# expectation over actions // if deterministic, it's unit mass
 			trans_prob * (
+				# reward
 				r +
+				# decayed sum of future value
 				gamma * value_func[s_]
 			)
 		)
@@ -118,6 +121,7 @@ def policy_evaluation(P, nS, nA, policy, gamma=0.9, tol=1e-3, verbose=False):
 		for s in range(nS): # iter over states, per procedure
 			# extract the action we wish to take
 			action = policy[s] # infinite horizon, so det.
+			# apply Bellman statewise
 			value_function_new[s] = bellman_operator_single(
 				P=P,
 				s=s,
@@ -164,7 +168,7 @@ def policy_improvement(P, nS, nA, value_from_policy, policy, gamma=0.9):
 	for s in range(nS):
 		Q_sa_vec = np.zeros(nA)
 		for action in range(nA):
-
+			# store state-action evaluation
 			Q_sa_vec[action] = bellman_operator_single(
 				P=P,
 				s=s,
@@ -174,6 +178,7 @@ def policy_improvement(P, nS, nA, value_from_policy, policy, gamma=0.9):
 			)
 
 		# new_policy[s] = np.where(Q_sa_vec == np.max(Q_sa_vec))[0][0]
+		# do I need to randomize here
 		new_policy[s] = np.argmax(Q_sa_vec)
 	############################
 	return new_policy
@@ -198,7 +203,6 @@ def policy_iteration(P, nS, nA, gamma=0.9, tol=10e-3):
 	"""
 
 	value_function = np.zeros(nS)
-	# WHY NOT RANDOMIZATION?
 	policy = np.zeros(nS, dtype=int)
 
 	############################
