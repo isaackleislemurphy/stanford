@@ -16,3 +16,6 @@ The files in this repo are structured as follows:
  	- `model.py`: contains functions to train, evaluate, and visualize your GAN. They should be utilized in one of the files in `src/scripts`.
  	- `scripts`: contains run-scripts to fit a particular model. Currently has `train_baseline.py` only; just call `python3 train_baseline.py` to
  	  deploy a training run.
+
+### Notes
+Lastly, as my AWS credit situation is still unresolved, the `src/scripts/train_baseline.py` script only functions for a small/toy dataset over a limited number of epochs on local CPU. Additional evaluation and model saving criteria will be pushed once VM/GPU situation is resolved. 
