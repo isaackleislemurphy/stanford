@@ -15,7 +15,7 @@ The files in this repo are structured as follows:
  	  and feature scaling values.
  	- `model.py`: contains functions to train, evaluate, and visualize your GAN. They should be utilized in one of the files in `src/scripts`.
  	- `scripts`: contains run-scripts to fit a particular model. Currently has `train_baseline.py` only; just call `python3 train_baseline.py` to
- 	  deploy a training run.
+ 	  deploy a training run. Since I am limited to running locally right now, model convergence and evaluation logs and plots will appear via `plt.show()`; however, once deployed virtually, they will likely save to a to-be-created folder inside `src`.
 
 ### Notes
 Lastly, as my AWS credit situation is still unresolved, the `src/scripts/train_baseline.py` script only functions for a small/toy dataset over a limited number of epochs on local CPU. Additional evaluation and model saving criteria will be pushed once VM/GPU situation is resolved. 
