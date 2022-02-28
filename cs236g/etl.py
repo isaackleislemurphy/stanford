@@ -51,7 +51,6 @@ def merge_plays_with_tracking(
 ):
     """
     Merges the play df onto the tracking df, and filters down to relevent personnel types
-
     Args:
       tracking_df : pd.DataFrame
         The third output of fetch_data()
@@ -60,7 +59,6 @@ def merge_plays_with_tracking(
       personnel_types : list[str]
         Personnel types -- in the format of plays_df.personnelO -- to be included
         in the ultimate dataset. Recommend using OFF_PERSONNEL_TYPES
-
     Returns : pd.DataFrame
       A dataframe containing play and tracking data
     """
@@ -110,22 +108,37 @@ def merge_plays_with_tracking(
 
     ### apply processed coordinate // flip if appropriate
     ## note dim change to make plays vertical and upwards
-    ## also doing feature scaling here
-    plays_tracking["y_coord"] = (
-        plays_tracking["x"].values * plays_tracking["vertical_orientation"].values
-        + (120 - plays_tracking["x"].values)
-        * (1 - plays_tracking["vertical_orientation"].values)
-    ) / SCALE_VALUES["Y"]
-    plays_tracking["x_coord"] = (
-        plays_tracking["y"].values * plays_tracking["vertical_orientation"].values
-        + (160 / 3 - plays_tracking["y"].values)
-        * (1 - plays_tracking["vertical_orientation"].values)
-    ) / SCALE_VALUES["X"]
-    plays_tracking["s"] = plays_tracking["s"].values / SCALE_VALUES["SPD"]
-    plays_tracking["a"] = plays_tracking["a"].values / SCALE_VALUES["ACC"]
-    ### scale down to ~ (-1, 1), so we can tanh against
-    for col in ["x_coord", "y_coord", "s", "a"]:
-        plays_tracking[col] = 2 * plays_tracking[col].values - 1.0
+
+    ### raw x/y coordinates, for debugging etc.
+    # y
+    plays_tracking["y_coord"] = plays_tracking["x"].values * plays_tracking[
+        "vertical_orientation"
+    ].values + (120 - plays_tracking["x"].values) * (
+        1 - plays_tracking["vertical_orientation"].values
+    )
+    # x
+    plays_tracking["x_coord"] = plays_tracking["y"].values * plays_tracking[
+        "vertical_orientation"
+    ].values + (
+        160 / 3 - plays_tracking["y"].values
+    ) * (  # field is 160 yards wide
+        1 - plays_tracking["vertical_orientation"].values
+    )
+
+    ### line of scrimmage in standardized coords
+    plays_tracking["line_of_scrimmage_coord"] = plays_tracking[
+        "absoluteYardlineNumber"
+    ].values * plays_tracking["vertical_orientation"].values + (
+        120 - plays_tracking["absoluteYardlineNumber"].values
+    ) * (
+        1 - plays_tracking["vertical_orientation"].values
+    )
+
+    ### each player's offset relative to LoS
+    plays_tracking["y_coord_los"] = (
+        plays_tracking["y_coord"].values
+        - plays_tracking["line_of_scrimmage_coord"].values
+    )
     return plays_tracking
 
 
@@ -166,11 +179,9 @@ def test_dupe(df):
     On inspection, the tracking coords -- while duped -- seem fine. But because they pop up
     so infrequently, I'm reluctant to proceed with them unless I fully knew the issue at hand.
     Hence, this function checks for such dupes.
-
     Args:
       df : pd.DataFrame
         A pandas df of tracking data for a single play
-
     Returns : bool
       Whether or not there is a dupe (True) or not (False)
     """
@@ -189,7 +200,6 @@ def test_skill_personnel_count(df):
     """
     Function that tests whether six skill players are on the field for the start of the play,
     per football rules
-
     Args:
       df : pd.DataFrame
         A pandas df of tracking data for a single play
@@ -207,7 +217,6 @@ def test_skill_personnel_count(df):
 def test_play_length(play_snapshot):
     """
     Makes sure data has sufficiently many rows, and is not a spike.
-
     Args:
       play_snapshot : pd.DataFrame
         A pandas df, as constructed in parse_passing_plays().
@@ -218,7 +227,6 @@ def test_play_length(play_snapshot):
 def test_play_integrity(tracking_df, play_snapshot):
     """
     Applies check_dupe(), check_personnel_count(), and ensures play is not a spike.
-
     Args:
       tracking_df : pd.DataFrame
         A pandas df of tracking data for a single play
@@ -237,17 +245,36 @@ def plot_play(df, figsize=(12, 6)):
     """
     Visualizes the routes associated with a particular play,
     for debugging and/or general understanding
-
     Args:
       df : pd.DataFrame
-        A dataframe, as outputted by merge_plays_with_tracking()
+        A dataframe, as wrangled + outputted by merge_plays_with_tracking()
     """
     ### figure size
     plt.rcParams["figure.figsize"] = figsize
+    ### plot line of scrimage
+    plt.plot(
+        [0, 160 / 3],
+        [
+            df.line_of_scrimmage_coord_raw.iloc[0],
+            df.line_of_scrimmage_coord_raw.iloc[0],
+        ],
+        label="LoS",
+        color="black",
+    )
+    plt.plot(
+        [0, 160 / 3],
+        [
+            df.line_of_scrimmage_coord_raw.iloc[0] + 10,
+            df.line_of_scrimmage_coord_raw.iloc[0] + 10,
+        ],
+        label="LoS + 10",
+        color="black",
+        linestyle="dashed",
+    )
     ### plot everybody's routes
     for name in df.displayName.unique():
         df_route = df.query(f"displayName == '{name}'")
-        plt.plot(df_route.x_coord.values, df_route.y_coord.values, label=name)
+        plt.plot(df_route.x_coord_raw.values, df_route.y_coord_raw.values, label=name)
     ### extract play descriptors
     yardline_side = df_route.yardlineSide.values[0]
     yardline_num = df_route.yardlineNumber.values[0]
@@ -271,13 +298,11 @@ def parse_passing_plays(plays_tracking, verbose=False):
     Given a dataframe outputted by merge_plays_tracking(), this function
     iterates through each play, extracts the relevant route/play window, and then performs
     basic integrity tests.
-
     Args:
       plays_tracking : pd.DataFrame
         A dataframe outputted by merge_plays_tracking()
       verbose : bool
         Whether or not to plot the plays as you parse them
-
     Returns : tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
       * A dataframe of parsed/tested tracking data
       * A dataframe of play dimensions
@@ -360,7 +385,9 @@ def parse_passing_plays(plays_tracking, verbose=False):
     return (play_statistic_full, play_frame_dims, failed_plays)
 
 
-def make_route_tensor_player(player_df, n_frames=N_FRAMES):
+def make_route_tensor_player(
+    player_df, n_frames=N_FRAMES, center_x=False, center_y=False
+):
     """
     Converts a df of a player's positioning within a particular passing play
     into a tensor for the purposes of modeling. Extracts coordinates, speed, and
@@ -368,23 +395,29 @@ def make_route_tensor_player(player_df, n_frames=N_FRAMES):
     so that the matrix is of a standard size. Notably, the "is_route_over" indicator
     serves as a flag that the route-running is over, and that the coordinates/speed/
     acceleration in the matrix are indeed padded.
-
     Args:
       player_df : pd.DataFrame
         A df for a single player/play pairing with `time`, `x_coords`, `y_coords`, `s` and `a`
         fields
       n_frames : int
         Number of frames for return matrix
-
+      center_x : bool
+        Whether or not to center the route on the x axis
+      center_y : bool
+        Whether or not to center the route on the y-axis
     Returns : np.array(N_frames, 5)
       A tensor of positioning data for a player and play.
     """
 
     ### make a tensor of player
-    player_df_tidy = player_df.sort_values("time")[
-        ["x_coord", "y_coord", "s", "a"]
-    ].head(n_frames)
+    player_df_tidy = player_df.sort_values("time")[PLAYER_TENSOR_COLS].head(n_frames)
     player_tensor = player_df_tidy.values  # (N_FRAMES x FRAME_WIDTH)
+    if center_y:
+        ### center LoS (y-coord)
+        player_tensor[:, 1] = player_tensor[:, 1] - player_tensor[0, 1]
+    if center_x:
+        ### center LoS (y-coord)
+        player_tensor[:, 0] = player_tensor[:, 0] - player_tensor[0, 0]
     return player_tensor
 
 
@@ -432,6 +465,10 @@ def make_route_tensor_play(df, n_frames=N_FRAMES):
         n_pad = n_frames - route_tensors_all.shape[0]
         ### switch on the indicator that play is over
         pad_tensor = np.hstack([np.zeros(route_tensors_all.shape[1] - 1), 1.0])
+        # use final Y's
+        pad_tensor[np.arange(1, 25, 4)] = route_tensors_all[-1, np.arange(1, 25, 4)]
+        # use final X's
+        pad_tensor[np.arange(0, 25, 4)] = route_tensors_all[-1, np.arange(0, 25, 4)]
         pad_tensor = np.vstack([pad_tensor for _ in range(n_pad)])
         route_tensors_all = np.vstack([route_tensors_all, pad_tensor])
     # gc.collect()
@@ -441,7 +478,6 @@ def make_route_tensor_play(df, n_frames=N_FRAMES):
 def make_route_tensors(play_statistic_full):
     """
     Makes route tensors, for modeling purposes.
-
     Args:
       play_statistic_full : pd.DataFrame
         A dataframe, as returned in the first index by parse_passing_plays()
@@ -465,11 +501,10 @@ def make_route_tensors(play_statistic_full):
     )
 
 
-def fetch_data_byweek(filepath=FILEPATH, week_num=2, **kwargs):
+def fetch_data_byweek(filepath=FILEPATH + "big-data-bowl-2021/", week_num=2, **kwargs):
     """
     Pulls game data, play data, and tracking data from Drive for a single
     week of play
-
     Args:
       filepath : str
         Filepath prefix from which to pull data. Should have files:
@@ -511,13 +546,11 @@ def fetch_data_byweek(filepath=FILEPATH, week_num=2, **kwargs):
 def fetch_data(week_start, week_end):
     """
     Gets all data relevant to the project.
-
     Args:
       week_start : int
         Starting week to pull data from, in [1, week_end]
       week_end : int
         Ending week to pull data from, in [week_start, 17]
-
     Returns : tuple[np.array, list[pd.DataFrame], list[pd.DataFrame]]
       * the route tensors, for use in modeling
       * a list of dataframes, each with tracking data corresponding to the first
@@ -535,3 +568,83 @@ def fetch_data(week_start, week_end):
     routes = np.concatenate(routes, axis=0)
     gc.collect()
     return routes, play_info, failures
+
+
+def make_play_z_inits(play_info_df):
+    """
+    Extracts the starting positions, and one-hot route labels, for all skill players
+    in the route.
+
+    Args:
+      play_info_df : pd.DataFrame
+        A dataframe -- likely to be an element of play_info, the second output of fetch_data
+    Returns : np.array
+      A vector containing starting position info
+    """
+    # filter down to first frame
+    play_info_df_ = play_info_df.query(f"time_str == '{min(play_info_df.time_str)}'")
+    ### use this to organize s.t. QB goes last
+    play_info_df_["pos_sort_idx"] = [
+        1 if item != "QB" else 2 for item in play_info_df_.position
+    ]
+    play_info_df_ = play_info_df_.sort_values(
+        ["pos_sort_idx", "x_coord"], ascending=True
+    )
+    ### make route indicators
+    for route_name in ROUTE_LABELS:
+        play_info_df_[f"is_route_{route_name}"] = (
+            play_info_df_["route"].values == route_name
+        ).astype(int)
+    ### collapse down as a vector
+    # initial positions first
+    z_supp_pos = play_info_df_[["x_coord", "y_coord_los", "s", "a"]].values.ravel()
+    # route tags
+    z_supp_route = play_info_df_[
+        [f"is_route_{route_name}" for route_name in ROUTE_LABELS]
+    ].values.ravel()
+    # QB doesn't get a route, so remove
+    z_supp_route = z_supp_route[: -len(ROUTE_LABELS)]
+    return np.hstack([z_supp_pos, z_supp_route])
+
+
+def center_routes(routes):
+    """
+    Centers each route such that it begins from the (0, 0) coordinate
+    """
+    routes = routes.copy()
+    routes[:, np.arange(0, 24, 4), :] = np.subtract(
+        routes[:, np.arange(0, 24, 4), :], routes[:, np.arange(0, 24, 4), 0, None]
+    )
+    routes[:, np.arange(1, 24, 4), :] = np.subtract(
+        routes[:, np.arange(1, 24, 4), :], routes[:, np.arange(1, 24, 4), 0, None]
+    )
+    return routes
+
+
+def scale_routes(routes):
+    """
+    Custom to each variable, coerces down to (-1, 1) scale
+    """
+    routes = routes.copy()
+    ### scale X
+    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] + 45) / (
+        45 + 45
+    )
+    ### scale Y
+    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] + 15) / (
+        55 + 15
+    )
+    ### speed
+    routes[:, np.arange(2, 24, 4), :] = (routes[:, np.arange(2, 24, 4), :] + 0) / (
+        12 - 0
+    )
+    ### accel
+    routes[:, np.arange(3, 24, 4), :] = (routes[:, np.arange(3, 24, 4), :] + 0) / (
+        12 - 0
+    )
+
+    ### (-1 ,1)
+    routes = routes * 2 - 1
+    routes[routes < -1.0] = -1.0
+    routes[routes > 1.0] = 1
+    return routes

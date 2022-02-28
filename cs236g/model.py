@@ -1,3 +1,5 @@
+"""Functions useful for modeling"""
+
 ### general imports
 import os
 import pickle
@@ -91,7 +93,6 @@ def make_grad_hook():
 def get_noise(n_samples, z_dim, device="cpu"):
     """
     Makes noise vecs to feed into generator.
-
     Args:
       n_samples: int
         the number of samples to generate, a scalar
@@ -99,7 +100,6 @@ def get_noise(n_samples, z_dim, device="cpu"):
         the dimension of the noise vector, a scalar
       device: str
         the device type, usually 'cpu'
-
     Returns : torch.tensor(n_samples, z_dim)
       The random amples
     """
@@ -113,7 +113,11 @@ class Generator(nn.Module):
     """
 
     def __init__(
-        self, z_dim=Z_DIM, play_len=N_FRAMES, play_width=FRAME_WIDTH, device="cpu"
+        self,
+        z_dim=Z_DIM + Z_SUPP_DIM,
+        play_len=N_FRAMES,
+        play_width=FRAME_WIDTH,
+        device="cpu",
     ):
         super(Generator, self).__init__()
         self.z_dim = z_dim
@@ -125,8 +129,9 @@ class Generator(nn.Module):
         # linear mapping
         self.generator_lin = nn.Sequential(
             # self.make_gen_lin_block(z_dim, play_len * z_dim)
-            self.make_gen_lin_block(z_dim, play_len),
-            self.make_gen_lin_block(play_len, play_len * z_dim),
+            self.make_gen_lin_block(z_dim, 2 * play_len),
+            # self.make_gen_lin_block(2 * play_len, play_len),
+            self.make_gen_lin_block(2 * play_len, play_len * z_dim),
         )
         # convoluted mapping
         self.generator_conv = nn.Sequential(
@@ -178,7 +183,6 @@ class Generator(nn.Module):
     def make_gen_lin_block(self, in_dim, out_dim, leaky_relu_activation=True):
         """
         Makes a linear layer for the initial linear pass, prior to convolution.
-
         Args:
           in_dim : int
             Input dimension
@@ -360,18 +364,23 @@ def weights_init(model):
         torch.nn.init.constant_(model.bias, 0)
 
 
-def plot_live_losses(generator_losses, critic_losses):
+def plot_live_losses(generator_losses, critic_losses, filename=None):
     """
     Plots generator and critic losses, as a check on convergence
     """
-    plt.rcParams["figure.figsize"] = (16, 4)
+    plt.rcParams["figure.figsize"] = (16, 8)
     plt.plot(generator_losses, label="Generator Loss")
     plt.plot(critic_losses, label="Critic Loss")
     plt.legend()
     plt.title("Running Loss Convergence")
     plt.xlabel("Step")
     plt.ylabel("Loss Value")
-    plt.show()
+    if filename is not None:
+        assert isinstance(filename, str)
+        plt.savefig(filename)
+        plt.clf()
+    else:
+        plt.show()
 
 
 def recover_gradient_snapshot(gen, crit):
@@ -382,9 +391,9 @@ def recover_gradient_snapshot(gen, crit):
     # recover gradient statistics
     gen_grads, crit_grads = [], []
     for param in gen.parameters():
-        gen_grads.append(param.grad.detach().norm().numpy())
+        gen_grads.append(param.grad.detach().cpu().norm().numpy())
     for param in crit.parameters():
-        crit_grads.append(param.grad.detach().norm().numpy())
+        crit_grads.append(param.grad.detach().cpu().norm().numpy())
     gen_grads = np.stack(gen_grads).flatten()
     crit_grads = np.stack(crit_grads).flatten()
 
@@ -394,12 +403,12 @@ def recover_gradient_snapshot(gen, crit):
     )
 
 
-def plot_live_gradients(grad_snapshots):
+def plot_live_gradients(grad_snapshots, filename=None):
     """
     Plots running gradients, so you can manually inspect for vanishment.
     """
     result = np.stack(grad_snapshots)
-    plt.rcParams["figure.figsize"] = (16, 5)
+    plt.rcParams["figure.figsize"] = (16, 8)
     fig, ax = plt.subplots(nrows=2)
     ax[0].plot(
         result[:, 0, 0], label="Generator (Min)", color="orange", linestyle="dashed"
@@ -416,29 +425,60 @@ def plot_live_gradients(grad_snapshots):
     plt.xlabel("Step")
     plt.ylabel("|Grad|")
     plt.title("Running Gradient Behavior")
-    plt.show()
+    if filename is not None:
+        assert isinstance(filename, str)
+        plt.savefig(filename)
+        plt.clf()
+    else:
+        plt.show()
 
 
-def plot_demo_noise(z_vec_demo, gen):
+def plot_demo_noise(z_vec_demo, gen, filename=None):
     """
     Given a vector of noise, plots the generator's output
     at a current state. Helpful in tracking the convergence
     of the generator
     """
-    plt.rcParams["figure.figsize"] = (16, 4)
-    fig, ax = plt.subplots(ncols=z_vec_demo.shape[0])
+    plt.rcParams["figure.figsize"] = (12, 12) if filename is None else (25, 25)
+    fig, ax = plt.subplots(ncols=5, nrows=5)
 
+    ctr_row, ctr_col = 0, 0
     for k in range(z_vec_demo.shape[0]):
         route_tensor = (gen(z_vec_demo).detach().numpy())[k].T
-        eval_frames = np.array(range(0, 40, 5))
+        eval_frames = np.array(range(0, 40, 1))
         for j, i in enumerate(range(0, 24, 4)):
-            ax[k].plot(
+            ax[ctr_row, ctr_col].plot(
                 route_tensor[eval_frames, i],
                 route_tensor[eval_frames, i + 1],
                 label=f"Route-Runner: {j}",
             )
+        if ctr_col == 4:
+            ctr_row += 1
+            ctr_col = 0
+        else:
+            ctr_col += 1
     plt.legend()
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Example Plays")
-    plt.show()
+    if filename is not None:
+        assert isinstance(filename, str)
+        plt.savefig(filename)
+        plt.clf()
+    else:
+        plt.show()
+
+
+def make_run_folders(run_id, configs, runpath=RUNPATH):
+    """
+    Makes a folder in drive in which to store your runs
+    """
+    os.mkdir(RUNPATH + run_id)
+    # directory to run folder
+    run_id_path = RUNPATH + run_id + "/"
+    # make relevant folders
+    os.mkdir(run_id_path + "plots/")
+    os.mkdir(run_id_path + "plots/sample_images")
+    os.mkdir(run_id_path + "weights/")
+    os.mkdir(run_id_path + "history/")
+    save_pickle(configs, run_id_path + "configs.pkl")
