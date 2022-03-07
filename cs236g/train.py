@@ -19,16 +19,18 @@ from model import *
 
 ### example configs
 CONFIGS = Configs(
-    n_epochs=100,
+    n_epochs=250,
     z_dim=Z_DIM,
-    display_step=1,
-    save_step=1,
-    batch_size=512,
-    lr=2e-4,  # 0.0002
+    display_step=5,
+    save_step=5,
+    batch_size=256,
+    lr=1e-4,  # 0.0002
     beta_1=0.5,
     beta_2=0.999,
-    c_lambda=10,
-    crit_repeats=5,
+    lambda_grad=10,  # Wasserstein penalty
+    lambda_init_pos=100.0,  # 10, # initial position penalty
+    lambda_kinematic=100.0,
+    crit_repeats=cr_,
     device="cpu",
     z_vec_demo=torch.hstack(
         [
@@ -81,21 +83,36 @@ def main(configs=CONFIGS):
         routes_train = load_pickle(FILEPATH + "routes_train.pkl")
         routes_dev = load_pickle(FILEPATH + "routes_dev.pkl")
         z_supp_train = load_pickle(FILEPATH + "z_supp_train.pkl")
+        routes_train_backup = routes_train.copy()
 
         play_info_train = load_pickle(FILEPATH + "play_info_train.pkl")
         play_info_dev = load_pickle(FILEPATH + "play_info_dev.pkl")
 
+    ### scaling
+    routes_train = scale_routes(center_routes(routes_train))
     z_scaler = StandardScaler()
-    # Z-scale the starting positions
     z_supp_train[:, 0:24] = z_scaler.fit_transform(z_supp_train[:, 0:24])
+    z_supp_train = np.hstack(
+        [
+            z_supp_train,
+            np.array(
+                [(np.argmax(item[-1, :]) / N_FRAMES) * 2 - 1 for item in routes_train]
+            ).reshape(-1, 1),
+        ]
+    )
 
     ########################################################################################
     # Configure storage
     ########################################################################################
     # name the run
-    run_id = f"lr{configs.lr}_clambda{configs.c_lambda}_cr{configs.crit_repeats}_bs{configs.batch_size}_z{configs.z_dim}"
+    # make a folder to save things
+    run_id = f"lr{configs.lr}_lambda_km{configs.lambda_kinematic}_lambda_ip{configs.lambda_init_pos}_lambda_grad{configs.lambda_grad}_cr{configs.crit_repeats}_bs{configs.batch_size}_z{configs.z_dim}"
+    ### initialize hyperparams ###
     ### make the folder
-    make_run_folders(run_id=run_id, configs=configs, runpath=RUNPATH)
+    try:
+        make_run_folders(run_id=run_id, configs=configs, runpath=RUNPATH)
+    except:
+        pass
 
     ########################################################################################
     # Setup GPU/CPU
@@ -112,25 +129,26 @@ def main(configs=CONFIGS):
     ########################################################################################
     # Build + Initialize models
     ########################################################################################
-    ### construct models ###
-    ### models
+    ### last minute data quality ###
+    # test here
+    assert np.unique(routes_train[:, np.arange(1, 24, 4), 0]).shape[0] == 1
+    assert np.unique(routes_train[:, np.arange(1, 24, 4), 0]).shape[0] == 1
+
+    ### models ###
     gen = Generator(configs.z_dim + Z_SUPP_DIM).to(device)
     crit = Critic().to(device)
-    ### optimizers
+    ### optimizers init ###
     gen_opt = torch.optim.Adam(
         gen.parameters(), lr=configs.lr, betas=(configs.beta_1, configs.beta_2)
     )
     crit_opt = torch.optim.Adam(
         crit.parameters(), lr=configs.lr, betas=(configs.beta_1, configs.beta_2)
     )
-    ### weights
+    ### weights init ###
     gen = gen.apply(weights_init)
     crit = crit.apply(weights_init)
 
-    ########################################################################################
-    # Initialize data
-    ########################################################################################
-    ### load data
+    ### load data ###
     data_loader = torch.utils.data.DataLoader(
         dataset=TensorDataset(
             torch.from_numpy(routes_train.astype("float32")).to(device),
@@ -139,10 +157,7 @@ def main(configs=CONFIGS):
         batch_size=configs.batch_size,
         shuffle=True,
     )
-    ########################################################################################
-    # Fit the model
-    ########################################################################################
-    ### fit model
+    ### fit model ###
     cur_step = 0
     generator_losses, critic_losses, grad_snapshots = [], [], []
     for epoch in range(configs.n_epochs):
@@ -155,19 +170,50 @@ def main(configs=CONFIGS):
             for k in range(configs.crit_repeats):
                 ### Update critic ###
                 crit_opt.zero_grad()
-                # fake_noise = get_noise(cur_batch_size, z_dim, device=device)
+                ## make an image
                 fake_noise = torch.hstack(
                     [get_noise(cur_batch_size, configs.z_dim, device=device), z_start]
                 )
                 fake = gen(fake_noise)
-                crit_fake_pred = crit(fake.detach())
-                crit_real_pred = crit(real)
+                ## make the supplementary design to pass through the critic
+                fake_supp = torch.cat(
+                    [
+                        penalize_initial_positions(real, fake.detach(), dim=[1]).view(
+                            len(fake), -1
+                        ),
+                        penalize_kinematic(fake.detach(), dim=[1, 2]).view(
+                            len(fake), -1
+                        ),
+                    ],
+                    dim=1,
+                )
+                real_supp = torch.cat(
+                    [
+                        penalize_initial_positions(real, real, dim=[1]).view(
+                            len(fake), -1
+                        ),
+                        penalize_kinematic(real, dim=[1, 2]).view(len(fake), -1),
+                    ],
+                    dim=1,
+                )
+                ## pass through critic
+                crit_fake_pred = crit(fake.detach(), fake_supp)
+                crit_real_pred = crit(real, real_supp)
 
                 epsilon = torch.rand(len(real), 1, 1, device=device, requires_grad=True)
-                gradient = compute_gradient(crit, real, fake.detach(), epsilon)
-                gp = penalize_gradient(gradient)
+                ## gradient penalty. Note img_supp = fake_supp passed via *args
+                gradient = compute_gradient(
+                    crit, real, fake.detach(), epsilon, fake_supp
+                )
+                gpen = penalize_gradient(gradient)
+
+                # print(f"Grad Penalty: {np.round(gpen.cpu().detach().numpy(), 3)} || Init Penalty: {np.round(ipen.cpu().detach().numpy(), 3)} ")
+                # print(pd.DataFrame(fake.cpu().detach().numpy()[0, 0:3, 0:10]))
                 crit_loss = get_crit_loss(
-                    crit_fake_pred, crit_real_pred, gp, configs.c_lambda
+                    crit_fake_pred,
+                    crit_real_pred,
+                    gpen,
+                    configs.lambda_grad,
                 )
 
                 # Keep track of the average critic loss in this batch
@@ -176,6 +222,7 @@ def main(configs=CONFIGS):
                 crit_loss.backward(retain_graph=True)
                 # Update optimizer
                 crit_opt.step()
+
             critic_losses += [mean_iteration_critic_loss]
 
             ### Update generator ###
@@ -184,9 +231,33 @@ def main(configs=CONFIGS):
                 [get_noise(cur_batch_size, configs.z_dim, device=device), z_start]
             )
             fake_2 = gen(fake_noise_2)
-            crit_fake_pred = crit(fake_2)
+            fake_2_supp = torch.cat(
+                [
+                    penalize_initial_positions(real, fake_2, dim=[1]).view(
+                        len(fake_2), -1
+                    ),
+                    penalize_kinematic(fake_2, dim=[1, 2]).view(len(fake_2), -1),
+                ],
+                dim=1,
+            )
+            # compute relevant penalties
+            ipen = penalize_initial_positions(real, fake_2)
+            kpen = penalize_kinematic(fake_2)
+            # pass through critic
+            crit_fake_pred = crit(fake_2, fake_2_supp)
 
-            gen_loss = get_gen_loss(crit_fake_pred)
+            # gen_loss = get_gen_loss(
+            #     crit_fake_pred,
+            #     ipen,
+            #     configs.lambda_init_pos
+            # )
+            gen_loss = get_gen_loss(
+                critic_fake_play=crit_fake_pred,
+                init_pos_pen=ipen,
+                kinematic_pen=kpen,
+                lambda_init_pos=configs.lambda_init_pos,
+                lambda_kinematic=configs.lambda_kinematic,
+            )
             gen_loss.backward(retain_graph=True)
 
             # Update the weights
@@ -199,6 +270,10 @@ def main(configs=CONFIGS):
             grad_snapshot = recover_gradient_snapshot(gen, crit)
             grad_snapshots.append(grad_snapshot)
             cur_step += 1
+        print("--------- Penalty Summary ---------")
+        print(f"Grad Penalty: {np.round(gpen.cpu().detach().numpy(), 3)}")
+        print(f"Init Penalty: {np.round(ipen.cpu().detach().numpy(), 3)}")
+        print(f"KM Penalty: {np.round(kpen.cpu().detach().numpy(), 3)}")
 
         if ((epoch + 1) % configs.save_step) == 0:
             gen.to("cpu")

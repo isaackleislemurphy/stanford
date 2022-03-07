@@ -18,9 +18,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 ### GCloud imports
-from google.colab import drive
-
-drive.mount("/content/drive")
+# from google.colab import drive
+# drive.mount("/content/drive")
 
 ### utils imports
 from constants import *
@@ -111,27 +110,23 @@ def merge_plays_with_tracking(
 
     ### raw x/y coordinates, for debugging etc.
     # y
-    plays_tracking["y_coord"] = plays_tracking["x"].values * plays_tracking[
-        "vertical_orientation"
-    ].values + (120 - plays_tracking["x"].values) * (
-        1 - plays_tracking["vertical_orientation"].values
+    plays_tracking["y_coord"] = (
+        plays_tracking["x"].values * plays_tracking["vertical_orientation"].values
+        + (120 - plays_tracking["x"].values)
+        * (1 - plays_tracking["vertical_orientation"].values)
     )
     # x
-    plays_tracking["x_coord"] = plays_tracking["y"].values * plays_tracking[
-        "vertical_orientation"
-    ].values + (
-        160 / 3 - plays_tracking["y"].values
-    ) * (  # field is 160 yards wide
-        1 - plays_tracking["vertical_orientation"].values
+    plays_tracking["x_coord"] = (
+        plays_tracking["y"].values * plays_tracking["vertical_orientation"].values
+        + (160 / 3 - plays_tracking["y"].values) # field is 160 yards wide
+        * (1 - plays_tracking["vertical_orientation"].values)
     )
 
     ### line of scrimmage in standardized coords
-    plays_tracking["line_of_scrimmage_coord"] = plays_tracking[
-        "absoluteYardlineNumber"
-    ].values * plays_tracking["vertical_orientation"].values + (
-        120 - plays_tracking["absoluteYardlineNumber"].values
-    ) * (
-        1 - plays_tracking["vertical_orientation"].values
+    plays_tracking["line_of_scrimmage_coord"] = (
+        plays_tracking["absoluteYardlineNumber"].values * plays_tracking["vertical_orientation"].values
+        + (120 - plays_tracking["absoluteYardlineNumber"].values)
+        * (1 - plays_tracking["vertical_orientation"].values)
     )
 
     ### each player's offset relative to LoS
@@ -254,22 +249,16 @@ def plot_play(df, figsize=(12, 6)):
     ### plot line of scrimage
     plt.plot(
         [0, 160 / 3],
-        [
-            df.line_of_scrimmage_coord_raw.iloc[0],
-            df.line_of_scrimmage_coord_raw.iloc[0],
-        ],
+        [df.line_of_scrimmage_coord_raw.iloc[0], df.line_of_scrimmage_coord_raw.iloc[0]],
         label="LoS",
-        color="black",
+        color="black"
     )
     plt.plot(
         [0, 160 / 3],
-        [
-            df.line_of_scrimmage_coord_raw.iloc[0] + 10,
-            df.line_of_scrimmage_coord_raw.iloc[0] + 10,
-        ],
+        [df.line_of_scrimmage_coord_raw.iloc[0] + 10, df.line_of_scrimmage_coord_raw.iloc[0] + 10],
         label="LoS + 10",
         color="black",
-        linestyle="dashed",
+        linestyle="dashed"
     )
     ### plot everybody's routes
     for name in df.displayName.unique():
@@ -385,9 +374,7 @@ def parse_passing_plays(plays_tracking, verbose=False):
     return (play_statistic_full, play_frame_dims, failed_plays)
 
 
-def make_route_tensor_player(
-    player_df, n_frames=N_FRAMES, center_x=False, center_y=False
-):
+def make_route_tensor_player(player_df, n_frames=N_FRAMES, center_x=False, center_y=False):
     """
     Converts a df of a player's positioning within a particular passing play
     into a tensor for the purposes of modeling. Extracts coordinates, speed, and
@@ -410,14 +397,16 @@ def make_route_tensor_player(
     """
 
     ### make a tensor of player
-    player_df_tidy = player_df.sort_values("time")[PLAYER_TENSOR_COLS].head(n_frames)
+    player_df_tidy = player_df.sort_values("time")[
+        PLAYER_TENSOR_COLS
+    ].head(n_frames)
     player_tensor = player_df_tidy.values  # (N_FRAMES x FRAME_WIDTH)
     if center_y:
-        ### center LoS (y-coord)
-        player_tensor[:, 1] = player_tensor[:, 1] - player_tensor[0, 1]
+      ### center LoS (y-coord)
+      player_tensor[:, 1] = player_tensor[:, 1] - player_tensor[0, 1]
     if center_x:
-        ### center LoS (y-coord)
-        player_tensor[:, 0] = player_tensor[:, 0] - player_tensor[0, 0]
+      ### center LoS (y-coord)
+      player_tensor[:, 0] = player_tensor[:, 0] - player_tensor[0, 0]
     return player_tensor
 
 
@@ -466,9 +455,9 @@ def make_route_tensor_play(df, n_frames=N_FRAMES):
         ### switch on the indicator that play is over
         pad_tensor = np.hstack([np.zeros(route_tensors_all.shape[1] - 1), 1.0])
         # use final Y's
-        pad_tensor[np.arange(1, 25, 4)] = route_tensors_all[-1, np.arange(1, 25, 4)]
+        pad_tensor[np.arange(1, 24, 4)] = route_tensors_all[-1, np.arange(1, 24, 4)]
         # use final X's
-        pad_tensor[np.arange(0, 25, 4)] = route_tensors_all[-1, np.arange(0, 25, 4)]
+        pad_tensor[np.arange(0, 24, 4)] = route_tensors_all[-1, np.arange(0, 24, 4)]
         pad_tensor = np.vstack([pad_tensor for _ in range(n_pad)])
         route_tensors_all = np.vstack([route_tensors_all, pad_tensor])
     # gc.collect()
@@ -501,7 +490,7 @@ def make_route_tensors(play_statistic_full):
     )
 
 
-def fetch_data_byweek(filepath=FILEPATH + "big-data-bowl-2021/", week_num=2, **kwargs):
+def fetch_data_byweek(filepath=FILEPATH+"big-data-bowl-2021/", week_num=2, **kwargs):
     """
     Pulls game data, play data, and tracking data from Drive for a single
     week of play
@@ -584,26 +573,18 @@ def make_play_z_inits(play_info_df):
     # filter down to first frame
     play_info_df_ = play_info_df.query(f"time_str == '{min(play_info_df.time_str)}'")
     ### use this to organize s.t. QB goes last
-    play_info_df_["pos_sort_idx"] = [
-        1 if item != "QB" else 2 for item in play_info_df_.position
-    ]
-    play_info_df_ = play_info_df_.sort_values(
-        ["pos_sort_idx", "x_coord"], ascending=True
-    )
+    play_info_df_["pos_sort_idx"] = [1 if item != "QB" else 2 for item in play_info_df_.position]
+    play_info_df_ = play_info_df_.sort_values(["pos_sort_idx", "x_coord"], ascending=True)
     ### make route indicators
     for route_name in ROUTE_LABELS:
-        play_info_df_[f"is_route_{route_name}"] = (
-            play_info_df_["route"].values == route_name
-        ).astype(int)
+      play_info_df_[f"is_route_{route_name}"] = (play_info_df_["route"].values == route_name).astype(int)
     ### collapse down as a vector
     # initial positions first
     z_supp_pos = play_info_df_[["x_coord", "y_coord_los", "s", "a"]].values.ravel()
     # route tags
-    z_supp_route = play_info_df_[
-        [f"is_route_{route_name}" for route_name in ROUTE_LABELS]
-    ].values.ravel()
+    z_supp_route = play_info_df_[[f"is_route_{route_name}" for route_name in ROUTE_LABELS]].values.ravel()
     # QB doesn't get a route, so remove
-    z_supp_route = z_supp_route[: -len(ROUTE_LABELS)]
+    z_supp_route = z_supp_route[:-len(ROUTE_LABELS)]
     return np.hstack([z_supp_pos, z_supp_route])
 
 
@@ -612,14 +593,9 @@ def center_routes(routes):
     Centers each route such that it begins from the (0, 0) coordinate
     """
     routes = routes.copy()
-    routes[:, np.arange(0, 24, 4), :] = np.subtract(
-        routes[:, np.arange(0, 24, 4), :], routes[:, np.arange(0, 24, 4), 0, None]
-    )
-    routes[:, np.arange(1, 24, 4), :] = np.subtract(
-        routes[:, np.arange(1, 24, 4), :], routes[:, np.arange(1, 24, 4), 0, None]
-    )
+    routes[:, np.arange(0, 24, 4), :] = np.subtract(routes[:, np.arange(0, 24, 4), :], routes[:, np.arange(0, 24, 4), 0, None])
+    routes[:, np.arange(1, 24, 4), :] = np.subtract(routes[:, np.arange(1, 24, 4), :], routes[:, np.arange(1, 24, 4), 0, None])
     return routes
-
 
 def scale_routes(routes):
     """
@@ -627,24 +603,16 @@ def scale_routes(routes):
     """
     routes = routes.copy()
     ### scale X
-    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] + 45) / (
-        45 + 45
-    )
+    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] + 45) / (45 + 45)
     ### scale Y
-    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] + 15) / (
-        55 + 15
-    )
+    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] + 15) / (55 + 15)
     ### speed
-    routes[:, np.arange(2, 24, 4), :] = (routes[:, np.arange(2, 24, 4), :] + 0) / (
-        12 - 0
-    )
+    routes[:, np.arange(2, 24, 4), :] = (routes[:, np.arange(2, 24, 4), :] + 0) / (12 - 0)
     ### accel
-    routes[:, np.arange(3, 24, 4), :] = (routes[:, np.arange(3, 24, 4), :] + 0) / (
-        12 - 0
-    )
+    routes[:, np.arange(3, 24, 4), :] = (routes[:, np.arange(3, 24, 4), :] + 0) / (12 - 0)
 
     ### (-1 ,1)
     routes = routes * 2 - 1
-    routes[routes < -1.0] = -1.0
-    routes[routes > 1.0] = 1
+    routes[routes < -1.] = -1.
+    routes[routes > 1.] = 1
     return routes

@@ -38,6 +38,92 @@ torch.manual_seed(49)
 pd.set_option("chained_assignment", None)
 
 
+def invert_scale(img, scale=1, offset=0):
+    """
+    Returns a variable to its original scale, for the purpose
+    of enforcing kinematic equations.
+
+    Args:
+      img : torch.tensor
+        A tensor or slice of tensor to be inverse scaled
+      scale : float
+        scaling value used in scaling
+      offset : float
+        centering value used in scaling
+    Returns : torch.tensor
+      The tensor img, but inverse-scaled
+    """
+    return torch.add(
+        torch.multiply(torch.multiply(torch.add(img, 1), 0.5), scale), offset
+    )
+
+
+def penalize_initial_positions(real, fake, dim=[0, 1]):
+    """ """
+    x_init_pen = torch.pow(
+        torch.add(
+            fake[:, list(np.arange(0, 24, 4)), 0],
+            -real[:, list(np.arange(0, 24, 4)), 0],
+        ),
+        2,
+    )
+    y_init_pen = torch.pow(
+        torch.add(
+            fake[:, list(np.arange(1, 24, 4)), 0],
+            -real[:, list(np.arange(1, 24, 4)), 0],
+        ),
+        2,
+    )
+    return torch.add(torch.mean(x_init_pen, dim=dim), torch.mean(y_init_pen, dim=dim))
+
+
+def eval_kinematic(img, buffer_pos=0.1, buffer_vel=0.1):
+    """ """
+    img_inv_sc = torch.clone(img)
+    pos_slice = list(np.sort(np.hstack([np.arange(0, 24, 4), np.arange(1, 24, 4)])))
+
+    # undo x/y scaling
+    x = invert_scale(img_inv_sc[:, list(np.arange(0, 24, 4)), :], 90, -45)
+    y = invert_scale(img_inv_sc[:, list(np.arange(1, 24, 4)), :], 70, -15)
+    v = invert_scale(img_inv_sc[:, list(np.arange(2, 24, 4)), :], 12, 0)
+    a = invert_scale(img_inv_sc[:, list(np.arange(2, 24, 4)), :], 12, 0)
+
+    # calculate displacement
+    squared_xy_delta = torch.pow(
+        torch.add(
+            torch.pow(torch.add(x[:, :, 1:], -x[:, :, :-1]), 2),
+            torch.pow(torch.add(y[:, :, 1:], -y[:, :, :-1]), 2),
+        ),
+        1 / 2,
+    )
+
+    # calculate v - v0; timestep length cancels
+    v_delta = torch.multiply(torch.add(v[:, :, 1:], v[:, :, :-1]), 0.1 / 2)
+    # violations of \delta_x = t(v + v_0)/2 equation
+    kinematic_violations_position = squared_xy_delta > v_delta + buffer_pos
+    # violations of \delta_v = v_0 + a_0 t
+    kinematic_violations_velo = v[:, :, 1:] > torch.add(
+        torch.add(v[:, :, :-1], torch.multiply(a[:, :, :-1], 0.1)), buffer_vel
+    )
+
+    return (kinematic_violations_position, kinematic_violations_velo)
+
+
+def penalize_kinematic(img, buffer_pos=0.1, buffer_vel=0.1, dim=[0, 1, 2]):
+    """
+    Penalizes an image for each pixel it violates the kinematic equations.
+
+    """
+    kin_violations_pos, kin_violations_velo = eval_kinematic(
+        img, buffer_pos, buffer_vel
+    )
+
+    return torch.add(
+        torch.mean(kin_violations_pos.float(), dim=dim),
+        torch.mean(kin_violations_velo.float(), dim=dim),
+    )
+
+
 def penalize_gradient(gradient):
     """
     Calculates penalty of gradient -- in terms of (||G||_2^2 - 1)^2.
@@ -52,21 +138,38 @@ def penalize_gradient(gradient):
     return penalty
 
 
-def get_gen_loss(critic_fake_play):
+def get_gen_loss(
+    critic_fake_play,
+    init_pos_pen=0.0,
+    kinematic_pen=0.0,
+    lambda_init_pos=0.0,
+    lambda_kinematic=0.0,
+):
     """
     Computes generator loss, given a fake play
     """
-    return -torch.mean(critic_fake_play)
+    return (
+        -torch.mean(critic_fake_play)
+        + torch.mul(lambda_init_pos, init_pos_pen)
+        + torch.mul(lambda_kinematic, kinematic_pen)
+    )
 
 
-def get_crit_loss(critic_fake_play, critic_real_play, grad_pen, lambda_=1.0):
+def get_crit_loss(
+    critic_fake_play,
+    critic_real_play,
+    grad_pen,
+    lambda_grad=10.0,
+):
     """
     Computes critic loss given real plays, fake plays, a penalty value, and a penalty weight.
+    TODO: Update docstring here
     """
     return (
         -get_gen_loss(critic_real_play)
-        + -get_gen_loss(critic_fake_play)
-        + torch.mul(lambda_, grad_pen)
+        - get_gen_loss(critic_fake_play)
+        + torch.mul(lambda_grad, grad_pen)
+        # + torch.mul(lambda_init_pos, init_pos_pen)
     )
 
 
@@ -128,10 +231,8 @@ class Generator(nn.Module):
         # Build the neural network
         # linear mapping
         self.generator_lin = nn.Sequential(
-            # self.make_gen_lin_block(z_dim, play_len * z_dim)
-            self.make_gen_lin_block(z_dim, 2 * play_len),
-            # self.make_gen_lin_block(2 * play_len, play_len),
-            self.make_gen_lin_block(2 * play_len, play_len * z_dim),
+            self.make_gen_lin_block(z_dim, 2 * play_len * z_dim),
+            self.make_gen_lin_block(2 * z_dim * play_len, play_len * z_dim),
         )
         # convoluted mapping
         self.generator_conv = nn.Sequential(
@@ -231,7 +332,7 @@ class Generator(nn.Module):
             return nn.Sequential(
                 conv(input_channels, output_channels, kernel_size, stride, **kwargs),
                 nn.BatchNorm1d(output_channels),
-                nn.ReLU(inplace=True),
+                nn.LeakyReLU(inplace=True),
             )
         else:
             return nn.Sequential(
@@ -258,27 +359,55 @@ class Critic(nn.Module):
         hidden_dim: the inner dimension, a scalar
     """
 
-    def __init__(self, play_width=FRAME_WIDTH, play_len=N_FRAMES, hidden_dim=64):
+    def __init__(
+        self, play_width=FRAME_WIDTH, play_len=N_FRAMES, hidden_dim=64, img_supp_dim=2
+    ):
         super(Critic, self).__init__()
         self.play_width = play_width
         self.play_len = play_len
         self.hidden_dim = hidden_dim
-        self.critic = nn.Sequential(
-            self.make_crit_block(
-                self.play_width, self.hidden_dim, kernel_size=8, stride=2
+        self.img_supp_dim = img_supp_dim
+        self.critic_conv = nn.Sequential(
+            self.make_crit_conv_block(
+                self.play_width, self.hidden_dim, kernel_size=4, stride=2, padding=2
             ),
-            self.make_crit_block(
-                self.hidden_dim, self.hidden_dim * 2, kernel_size=6, stride=2
+            self.make_crit_conv_block(
+                self.hidden_dim, self.hidden_dim * 2, kernel_size=4, stride=2, padding=2
             ),
-            self.make_crit_block(
-                self.hidden_dim * 2, self.hidden_dim * 2, kernel_size=6, stride=2
+            self.make_crit_conv_block(
+                self.hidden_dim * 2,
+                self.hidden_dim * 4,
+                kernel_size=4,
+                stride=1,
+                padding=1,
             ),
-            self.make_crit_block(
-                self.hidden_dim * 2, 1, kernel_size=4, stride=2, final_layer=True
-            ),
+            self.make_crit_conv_block(self.hidden_dim * 4, 1, kernel_size=4, stride=1),
+        )
+        self.critic_lin = nn.Sequential(
+            # self.make_crit_lin_block(self.play_len + self.img_supp_dim, 256, True),
+            self.make_crit_lin_block(16 + self.img_supp_dim, 256, True),
+            self.make_crit_lin_block(256, 128, True),
+            self.make_crit_lin_block(128, 1, False),
         )
 
-    def make_crit_block(
+    def make_crit_lin_block(self, in_dim, out_dim, leaky_relu_activation=True):
+        """
+        Makes a linear layer for the initial linear pass, prior to convolution.
+        Args:
+          in_dim : int
+            Input dimension
+          out_dim : int
+            Desired output dimension of linear layer
+          leaky_relu_activation : bool
+            Whether or not to add LeakyReLU activation
+        """
+        if leaky_relu_activation:
+            return nn.Sequential(
+                nn.Linear(in_dim, out_dim), nn.LeakyReLU(0.2, inplace=True)
+            )
+        return nn.Sequential(nn.Linear(in_dim, out_dim))
+
+    def make_crit_conv_block(
         self,
         input_channels,
         output_channels,
@@ -313,18 +442,27 @@ class Critic(nn.Module):
                 ),
             )
 
-    def forward(self, image):
+    def forward(self, image, img_supp):
         """
         Function for completing a forward pass of the critic: Given an image tensor,
         returns a 1-dimension tensor representing fake/real.
         Parameters:
             image: a flattened image tensor with dimension (im_chan)
         """
-        critic_pred = self.critic(image)
-        return critic_pred.view(len(critic_pred), -1)
+
+        # put image through conv layers
+        result_a = self.critic_conv(image).view(len(image), -1)
+
+        # append img_supp
+        result_b = torch.cat([result_a, img_supp], dim=1)
+
+        # put through linear layers
+        result_c = self.critic_lin(result_b)
+        return result_c
+        # return critic_pred.view(len(critic_pred), -1)
 
 
-def compute_gradient(critic, real, fake, epsilon):
+def compute_gradient(critic, real, fake, epsilon, *args, **kwargs):
     """
     Return the gradient of the critic's scores with respect to mixes of real and fake images.
     Parameters:
@@ -332,6 +470,7 @@ def compute_gradient(critic, real, fake, epsilon):
         real: a batch of real images
         fake: a batch of fake images
         epsilon: a vector of the uniformly random proportions of real/fake per mixed image
+        **kwargs passed to critic
     Returns:
         gradient: the gradient of the critic's scores, with respect to the mixed image
     """
@@ -339,7 +478,7 @@ def compute_gradient(critic, real, fake, epsilon):
     mixed_plays = real * epsilon + fake * (1 - epsilon)
 
     # Calculate the critic's scores on the mixed images
-    mixed_scores = critic(mixed_plays)
+    mixed_scores = critic(mixed_plays, *args, **kwargs)
 
     # Take the gradient of the scores with respect to the images
     gradient = torch.autograd.grad(
@@ -439,18 +578,25 @@ def plot_demo_noise(z_vec_demo, gen, filename=None):
     at a current state. Helpful in tracking the convergence
     of the generator
     """
+    route_runner_colors = ["blue", "orange", "red", "green", "pink", "brown"]
     plt.rcParams["figure.figsize"] = (12, 12) if filename is None else (25, 25)
     fig, ax = plt.subplots(ncols=5, nrows=5)
 
     ctr_row, ctr_col = 0, 0
     for k in range(z_vec_demo.shape[0]):
         route_tensor = (gen(z_vec_demo).detach().numpy())[k].T
-        eval_frames = np.array(range(0, 40, 1))
+        eval_frames = np.array(range(0, 75, 1))
         for j, i in enumerate(range(0, 24, 4)):
+            # plot route
             ax[ctr_row, ctr_col].plot(
                 route_tensor[eval_frames, i],
                 route_tensor[eval_frames, i + 1],
-                label=f"Route-Runner: {j}",
+                label=f"Route-Runner: {j}" if j < 5 else "QB",
+                c=route_runner_colors[j],
+                alpha=0.5,
+            )
+            ax[ctr_row, ctr_col].scatter(
+                route_tensor[0, i], route_tensor[0, i + 1], c="black", marker="^"
             )
         if ctr_col == 4:
             ctr_row += 1

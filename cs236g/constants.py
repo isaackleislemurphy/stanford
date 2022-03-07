@@ -54,9 +54,9 @@ SCALE_VALUES = {
 }
 
 ### initial dims of latent space
-Z_DIM = 24
+Z_DIM = 32
 ### dimension of play start
-Z_SUPP_DIM = 89
+Z_SUPP_DIM = 90
 
 
 ### use this to store model configuration
@@ -71,7 +71,9 @@ Configs = namedtuple(
         "lr",
         "beta_1",
         "beta_2",
-        "c_lambda",
+        "lambda_grad",
+        "lambda_init_pos",
+        "lambda_kinematic",
         "crit_repeats",
         "device",
         "z_vec_demo",
