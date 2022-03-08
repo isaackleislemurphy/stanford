@@ -542,23 +542,28 @@ def recover_gradient_snapshot(gen, crit):
     )
 
 
-def plot_live_gradients(grad_snapshots, filename=None):
+def plot_live_gradients(grad_snapshots, filename=None, full_plot=True):
     """
     Plots running gradients, so you can manually inspect for vanishment.
     """
     result = np.stack(grad_snapshots)
     plt.rcParams["figure.figsize"] = (16, 8)
     fig, ax = plt.subplots(nrows=2)
-    ax[0].plot(
+    
+    if full_plot:
+        ax[0].plot(
         result[:, 0, 0], label="Generator (Min)", color="orange", linestyle="dashed"
     )
     ax[0].plot(result[:, 0, 1], label="Generator (Mean)", color="orange")
-    ax[0].plot(
+    if full_plot:
+        ax[0].plot(
         result[:, 0, 2], label="Generator (Max)", color="orange", linestyle="dotted"
     )
-    ax[1].plot(result[:, 1, 0], label="Critic (Min)", color="blue", linestyle="dashed")
+    if full_plot:
+        ax[1].plot(result[:, 1, 0], label="Critic (Min)", color="blue", linestyle="dashed")
     ax[1].plot(result[:, 1, 1], label="Critic (Mean)", color="blue")
-    ax[1].plot(result[:, 1, 2], label="Critic (Max)", color="blue", linestyle="dotted")
+    if full_plot:
+        ax[1].plot(result[:, 1, 2], label="Critic (Max)", color="blue", linestyle="dotted")
 
     plt.legend()
     plt.xlabel("Step")

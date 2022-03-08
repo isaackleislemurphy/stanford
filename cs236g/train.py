@@ -11,26 +11,79 @@ from sklearn.preprocessing import StandardScaler
 
 # do you want to re-read data
 READ_DATA = False
+MINI_DATA = False
 
 from constants import *
 from etl import *
 from model import *
 
 
+########################################################################################
+# Ingest
+########################################################################################
+if READ_DATA:
+    # read train + val
+    routes_train, play_info_train, failures_train = fetch_data(
+            week_start=2, week_end=13
+    )
+    z_supp_train = np.vstack(
+        [make_play_z_inits(item) for item in tqdm(play_info_train)]
+    )
+
+    routes_dev, play_info_dev, failures_dev = fetch_data(week_start=14, week_end=15)
+
+    save_pickle(routes_train, FILEPATH + "routes_train.pkl")
+    save_pickle(play_info_train, FILEPATH + "play_info_train.pkl")
+    save_pickle(failures_train, FILEPATH + "failures_train.pkl")
+    save_pickle(z_supp_train, FILEPATH + "z_supp_train.pkl")
+
+    save_pickle(routes_dev, FILEPATH + "routes_dev.pkl")
+    save_pickle(play_info_dev, FILEPATH + "play_info_dev.pkl")
+    save_pickle(failures_dev, FILEPATH + "failures_dev.pkl")
+
+else:
+    routes_train = load_pickle(FILEPATH + "routes_train.pkl")
+    routes_dev = load_pickle(FILEPATH + "routes_dev.pkl")
+    z_supp_train = load_pickle(FILEPATH + "z_supp_train.pkl")
+    routes_train_backup = routes_train.copy()
+
+    play_info_train = load_pickle(FILEPATH + "play_info_train.pkl")
+    play_info_dev = load_pickle(FILEPATH + "play_info_dev.pkl")
+
+### scaling
+    routes_train = scale_routes(center_routes(routes_train))
+    z_scaler = StandardScaler()
+    z_supp_train[:, 0:24] = z_scaler.fit_transform(z_supp_train[:, 0:24])
+    z_supp_train = np.hstack(
+        [
+            z_supp_train,
+            np.array(
+                [(np.argmax(item[-1, :]) / N_FRAMES) * 2 - 1 for item in routes_train]
+            ).reshape(-1, 1),
+        ]
+    )
+
+if MINI_DATA:
+    routes_train = routes_train[0:25, :, :]
+    z_supp_train = z_supp_train[0:25, :]
+# breakpoint()
+print(f"Data shape: {routes_train.shape}")
+
+Z_DIM = 64
 ### example configs
 CONFIGS = Configs(
     n_epochs=250,
     z_dim=Z_DIM,
     display_step=5,
-    save_step=5,
+    save_step=1,
     batch_size=256,
     lr=1e-4,  # 0.0002
     beta_1=0.5,
     beta_2=0.999,
     lambda_grad=10,  # Wasserstein penalty
-    lambda_init_pos=100.0,  # 10, # initial position penalty
-    lambda_kinematic=100.0,
-    crit_repeats=cr_,
+    lambda_init_pos=1.0,  # 10, # initial position penalty
+    lambda_kinematic=1.0,
+    crit_repeats=5,
     device="cpu",
     z_vec_demo=torch.hstack(
         [
@@ -59,48 +112,6 @@ def main(configs=CONFIGS):
     ########################################################################################
     # Ingest
     ########################################################################################
-    if READ_DATA:
-        # read train + val
-        routes_train, play_info_train, failures_train = fetch_data(
-            week_start=2, week_end=13
-        )
-        z_supp_train = np.vstack(
-            [make_play_z_inits(item) for item in tqdm(play_info_train)]
-        )
-
-        routes_dev, play_info_dev, failures_dev = fetch_data(week_start=14, week_end=15)
-
-        save_pickle(routes_train, FILEPATH + "routes_train.pkl")
-        save_pickle(play_info_train, FILEPATH + "play_info_train.pkl")
-        save_pickle(failures_train, FILEPATH + "failures_train.pkl")
-        save_pickle(z_supp_train, FILEPATH + "z_supp_train.pkl")
-
-        save_pickle(routes_dev, FILEPATH + "routes_dev.pkl")
-        save_pickle(play_info_dev, FILEPATH + "play_info_dev.pkl")
-        save_pickle(failures_dev, FILEPATH + "failures_dev.pkl")
-
-    else:
-        routes_train = load_pickle(FILEPATH + "routes_train.pkl")
-        routes_dev = load_pickle(FILEPATH + "routes_dev.pkl")
-        z_supp_train = load_pickle(FILEPATH + "z_supp_train.pkl")
-        routes_train_backup = routes_train.copy()
-
-        play_info_train = load_pickle(FILEPATH + "play_info_train.pkl")
-        play_info_dev = load_pickle(FILEPATH + "play_info_dev.pkl")
-
-    ### scaling
-    routes_train = scale_routes(center_routes(routes_train))
-    z_scaler = StandardScaler()
-    z_supp_train[:, 0:24] = z_scaler.fit_transform(z_supp_train[:, 0:24])
-    z_supp_train = np.hstack(
-        [
-            z_supp_train,
-            np.array(
-                [(np.argmax(item[-1, :]) / N_FRAMES) * 2 - 1 for item in routes_train]
-            ).reshape(-1, 1),
-        ]
-    )
-
     ########################################################################################
     # Configure storage
     ########################################################################################
@@ -306,6 +317,7 @@ def main(configs=CONFIGS):
             plot_live_gradients(
                 grad_snapshots, filename=RUNPATH + run_id + "/plots/grads.png"
             )
+            plot_live_gradients(grad_snapshots, filename=RUNPATH+run_id+"/plots/grads_small.png", full_plot=False)
             plot_demo_noise(
                 configs.z_vec_demo.cpu(),
                 gen,

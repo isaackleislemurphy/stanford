@@ -54,7 +54,7 @@ SCALE_VALUES = {
 }
 
 ### initial dims of latent space
-Z_DIM = 32
+Z_DIM = 64
 ### dimension of play start
 Z_SUPP_DIM = 90
 
