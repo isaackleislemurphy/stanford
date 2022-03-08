@@ -1,0 +1,10 @@
+matplotlib
+numpy
+pandas
+scipy
+seaborn
+session_info
+sklearn
+torch
+torchvision
+tqdm
