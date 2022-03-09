@@ -601,18 +601,21 @@ def scale_routes(routes):
     """
     Custom to each variable, coerces down to (-1, 1) scale
     """
-    routes = routes.copy()
+#    routes = routes.copy()
     ### scale X
-    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] + 45) / (45 + 45)
+#    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] + 45) / (45 + 45)
     ### scale Y
-    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] + 15) / (55 + 15)
+#    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] + 15) / (55 + 15)
     ### speed
-    routes[:, np.arange(2, 24, 4), :] = (routes[:, np.arange(2, 24, 4), :] + 0) / (12 - 0)
+#    routes[:, np.arange(2, 24, 4), :] = (routes[:, np.arange(2, 24, 4), :] + 0) / (12 - 0)
     ### accel
-    routes[:, np.arange(3, 24, 4), :] = (routes[:, np.arange(3, 24, 4), :] + 0) / (12 - 0)
-
+#    routes[:, np.arange(3, 24, 4), :] = (routes[:, np.arange(3, 24, 4), :] + 0) / (12 - 0)
+    routes[:, np.arange(0, 24, 4), :] = (routes[:, np.arange(0, 24, 4), :] / 11.6)
+    routes[:, np.arange(1, 24, 4), :] = (routes[:, np.arange(1, 24, 4), :] / 25)
+    routes[:, np.arange(2, 24, 4), :] = ((routes[:, np.arange(2, 24, 4), :] + 0) / (12 - 0)) * 2 - 1
+    routes[:, np.arange(3, 24, 4), :] = ((routes[:, np.arange(3, 24, 4), :] + 0) / (12 - 0)) * 2 - 1
     ### (-1 ,1)
-    routes = routes * 2 - 1
-    routes[routes < -1.] = -1.
-    routes[routes > 1.] = 1
+#    routes = routes * 2 - 1
+#    routes[routes < -1.] = -1.
+#    routes[routes > 1.] = 1
     return routes

@@ -83,8 +83,10 @@ def eval_kinematic(img, buffer_pos=0.1, buffer_vel=0.1):
     pos_slice = list(np.sort(np.hstack([np.arange(0, 24, 4), np.arange(1, 24, 4)])))
 
     # undo x/y scaling
-    x = invert_scale(img_inv_sc[:, list(np.arange(0, 24, 4)), :], 90, -45)
-    y = invert_scale(img_inv_sc[:, list(np.arange(1, 24, 4)), :], 70, -15)
+ #   x = invert_scale(img_inv_sc[:, list(np.arange(0, 24, 4)), :], 90, -45)
+ #   y = invert_scale(img_inv_sc[:, list(np.arange(1, 24, 4)), :], 70, -15)
+    x = img_inv_sc[:, list(np.arange(0, 24, 4)), :] * 11.6
+    y = img_inv_sc[:, list(np.arange(1, 24, 4)), :] * 25
     v = invert_scale(img_inv_sc[:, list(np.arange(2, 24, 4)), :], 12, 0)
     a = invert_scale(img_inv_sc[:, list(np.arange(2, 24, 4)), :], 12, 0)
 
@@ -337,7 +339,7 @@ class Generator(nn.Module):
         else:
             return nn.Sequential(
                 conv(input_channels, output_channels, kernel_size, stride, **kwargs),
-                nn.Tanh(),
+#                nn.Tanh(),
             )
 
     def forward(self, z_vec):
