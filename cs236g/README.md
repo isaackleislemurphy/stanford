@@ -22,3 +22,6 @@ moreover, it makes it incredibly easy to save your training results to drive, wi
 - `./CS236G`
 - `./CS236G/data/`
 - `./CS236G/runs/`
+
+### Requirements
+Run `pip install -r requirements.txt` or `pip install -r requirements_vanilla.txt` before training. Note that `requirements.txt` is guaranteed to work, but `requirements_vanilla.txt` may be more compatible with wherever the code is being run. 
