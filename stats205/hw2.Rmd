@@ -33,7 +33,8 @@ perturb_test_wilcox <- function(data, value, idx=15){
   coef(fit)[2]
 }
 
-XSEQ = seq(-1000, 1000, length.out=1000)
+# XSEQ = seq(-1000, 1000, length.out=1000)
+XSEQ = c(-995, -95, -25, -5, 5, 10, 30, 100, 1000)
 
 sapply(
   # c(-995, -95, -25, -5, 5, 10, 30, 100, 1000), 
@@ -118,13 +119,15 @@ compute_theil_estimator <- function(x, y){
 
 ### b.)
 ```{r}
-compute_boot_theil <- function(x, y, S=10000, seed=2022){
+compute_boot_theil <- function(x, y, S=10000, seed=2022, alpha=.05){
+  #' alpha specfies conf.level, e.g. .05 --> .95
   set.seed(seed)
   sapply(1:S, function(s){
     slice_vec = sample(1:length(x), length(x), replace=T)
     xs = x[slice_vec]; ys = y[slice_vec]
     compute_theil_estimator(x=xs, y=ys)
   }) -> boot_result
+  quantile(boot_result, c(alpha / 2, 1-alpha / 2))
 }
 ```
 
@@ -201,7 +204,7 @@ cat("Tau_hat: ", wfit2$tauhat, "\n")
 cat("Robust R^2: ", summary(wfit2)$R2)
 ```
 
-The simpler model -- the linear one -- appears to hold up better, achieving a slightly better Robust R-squared. Hence, we'll go with that.
+The simpler model -- the linear one -- appears to hold up better, achieving a slightly better Robust R-squared. Hence, we'll go with that as our final model.
 
 
 ### c.)
@@ -257,6 +260,8 @@ Kendall:
 ```{r}
 cor(bb10$hr, bb10$rbi, method="kendall")
 ```
+
+As we see, the Pearson and Spearman correlations are nearly identical, indicating that the correlation of the values is about that of the correlation of the rankings of the values -- given the near perfect linearity, this makes some amount of sense. Elsewhere, the kendall correlation is much lower, suggesting the association is not as strong under Kendall's framework.
 
 
 ## 4.9.19
@@ -338,7 +343,7 @@ where now, the p-value runs slightly higher than that of the original Kruskal-Wa
 ```{r}
 summary(Rfit::oneway.rfit(x, g), method="tukey")
 ```
-As all of the `I, J` intervals contain zero here, we (by the duality of CIs and p-values) again would have a p-value that would fail to reject. This is yet another finding in line iwth the K-W analysis.
+As all of the `I, J` intervals contain zero here, we (by the duality of CIs and p-values) again would have a p-value that would fail to reject. This is yet another finding in line with the K-W analysis, which concluded similarly.
 
 
 ## 5.9.3
@@ -545,6 +550,9 @@ ci_96
 ```
 
 ### f.) // g.)
+
+**Note** - in this problem, we are instructed to follow the confidence interval procedure set forth in 4.4.4. As instructed, I do this in the code chunks below, but I am not sure this is the correct procedure. More specifically, I don't think that a simple $\sqrt{x^T\Sigma x}$ is appropriate for the AR(2) model in the n-ahead CIs (i.e. the` t=97, 98` cases in the second half of the problem), as the entries of the "x" vector are being updated with predictions, so uncertainty should compound the further out you go. Just making a note of it here -- I'm following textbook instructions, but this may be worth clarification in class.TL; DR, I don't think it's as simple as taking an OLS CI in the n-ahead situations, even though we are instructed to do so.
+
 The same, but for `t=97`. Here, we're just stepping forward, adding old predictions into the lag and updating after each iteration. The mean:
 ```{r}
 x97 = c(1, yhat_96, x96[2])
