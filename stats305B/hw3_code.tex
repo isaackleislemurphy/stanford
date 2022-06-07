@@ -1,0 +1,1796 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\title{HW3}
+\author{Isaac Kleisle-Murphy}
+\date{2/7/2022}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={HW3},
+  pdfauthor={Isaac Kleisle-Murphy},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+\hypertarget{section}{%
+\subsection{8.8}\label{section}}
+
+\hypertarget{a.}{%
+\subsubsection{a.)}\label{a.}}
+
+Since there are \(K=5\) response categories, we include \(K-1 = 4\)
+intercepts -- one for categories 1, through 4, with the fifth omitted
+and thus serving as a baseline (lest the model be overparameterized).
+This is akin to the baseline category in multinomial logit regression
+(which can be derived off of this setup). Hence, looking at the table,
+we see that the model is, for cumulative probabilities and
+\(j=1, \ldots, 5\) \[
+g(P(Response \leq j)) = \left(\sum_{i=1}^4 \alpha_i \cdot \delta(j = i)\right) + \beta_g \cdot \delta(female) + \beta_\ell\cdot \delta(rural) + 
+\beta_s \delta(no\;seatbelt) + \beta_{\ell, s} \delta(rural)\cdot \delta(no\; seatbelt)
+\] for logit \(g\). Note that the remaining features are indicators,
+with males, urban, and yes seatbelt all baselines (i.e.~indicator
+switched on for not those categories); \(\alpha_j\)'s correspond to
+intercepts, and \(\beta\)'s correspond to feature/indicator
+coefficients. Now consider what this looks like for males
+(\(\delta(female) = 0)\)) in urban locations (\(\delta(rural) = 0\)) in
+seat belts \((\delta(no\; seatbelt) = 0\)) -- i.e.~when all indicators
+have been switched off. Probabilities are then (\(\sigma\) is the
+sigmoid)
+
+\begin{itemize}
+\item
+  \(j=1: \sigma(\alpha_1) = 1/(1 + exp(-3.3074))\approx .965\)
+\item
+  \(j=2: \sigma(\alpha_2) = 1/(1 + exp(-3.4818))\approx .970\)
+\item
+  \(j=3: \sigma(\alpha_3) = 1/(1 + exp(-5.3494))\approx .995\)
+\item
+  \(j=4: \sigma(\alpha_4) = 1/(1 + exp(-7.2563))\approx .9993\)
+\item
+  \(j=5: 1\)
+\end{itemize}
+
+We can then subtract sequentially to get probabilities (j=1 to 5, in
+that order) of
+\((.965 - 0, .970 - .965, .995 - .970, .9993 - .995, 1 - .9993) = (.965, . 005, .025, .0043, .007)\)).
+
+In other words, the intercepts dictate the baseline probabilities, where
+the baseline is constructed to be male/urban/seatbelted.
+
+\hypertarget{b.}{%
+\subsubsection{b.)}\label{b.}}
+
+An estimate/SD in the table assume everything else held constant, so we
+can extracting the female row of the table allows us to answer the
+question at hand. We have estimate -.5463 and SD .0272, and hence a
+log-space CI of \(-.5463 \pm 1.96\cdot .0272 = [-0.599612, -0.492988]\),
+which exponentiates to \(0.5490246 0.6107986\). That is, given urban
+vs.~rural location and seat belt vs.~not choice, we are 95\% confident
+that the odds of injury below any of the five specified levels for a
+female passenger sit between .549 and .622 times that for a male.
+
+\hypertarget{c.}{%
+\subsubsection{c.)}\label{c.}}
+
+First, observe that for rural locations without a seatbelt, the
+interaction effect is -.1244 in the log space. First, plugging in
+indicators \(\delta(rural = 1)\) for the rural setting, we have an odds
+ratio of (the gender terms, as they are given and un-interacted, simply
+cancel out): \[
+OR = \frac{
+P(R\leq j|\delta(no\;seatbelt)=1, \delta(rural) = 1)P(R > j|\delta(no\;seatbelt)=0, \delta(rural) = 1)
+}{
+P(R \leq j|\delta(no\;seatbelt)=0, \delta(rural) = 1)P(R > |\delta(no\;seatbelt)=1, \delta(rural) = 1)
+}\\
+=
+\frac{
+\sigma(\alpha_j + \beta_s\cdot 1 + \beta_\ell\cdot 1 + \beta_{s, \ell}\cdot 1 \cdot 1)(1 - \sigma(\alpha_j + \beta_s\cdot 0 + \beta_\ell\cdot 1 + \beta_{s, \ell}\cdot 0))
+}{
+\sigma(\alpha_j + \beta_s\cdot 0 + \beta_\ell\cdot 1 + \beta_{s, \ell}\cdot 0 \cdot 1)(1 - \sigma(\alpha_j + \beta_s\cdot 1 + \beta_\ell\cdot 1 + \beta_{s, \ell}\cdot 1 \cdot 1))
+} \\
+=
+\frac{
+\sigma(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell})(1 - \sigma(\alpha_j +  \beta_\ell ))
+}{
+\sigma(\alpha_j + \beta_\ell)(1 - \sigma(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell}))
+} \\
+=
+\frac{
+    \frac{
+      \exp(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell})
+    }{
+    1 + \exp(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell})
+    }\cdot
+    \frac{
+      1
+    }{
+    1 + \exp(\alpha_j + \beta_\ell )
+    }
+}{  
+    \frac{
+      \exp(\alpha_j + \beta_\ell )
+    }{
+    1 + \exp(\alpha_j + \beta_\ell )
+    }\cdot
+    \frac{
+      1
+    }{
+    1 + \exp(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell})
+    }
+} \\
+=
+\frac{\exp(\alpha_j + \beta_s + \beta_\ell + \beta_{s, \ell})}{\exp(\alpha_j + \beta_\ell )} \\
+=
+\exp(\beta_s + \beta_{s, \ell}) \\
+=
+\exp(-.7602 - .1244) \\
+\approx
+0.4128793
+\] For the urban odds ratio, the above holds, however the
+\(\beta_{s, \ell}\) is always switched off, as \(\delta(rural) =0\) and
+the interaction is always zeroed. Hence, the algebra from above holds,
+but the \(\beta_{s, \ell}\) is always zero'd out, and the odds ratio is
+thus \[
+\exp(-.7602 - 0) \approx 0.4675729.
+\] In other words, the interaction term has a multiplicative effect of
+\(\exp(-.1244)\) on the odds ratios, in moving from the urban case to
+the rural case (given gender).
+
+\hypertarget{section-1}{%
+\subsection{8.10}\label{section-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{require}\NormalTok{(dplyr)}
+\FunctionTok{require}\NormalTok{(VGAM)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: VGAM
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: stats4
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: splines
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} using Prof. Taylors vglm package}
+
+\NormalTok{data }\OtherTok{=}\FunctionTok{c}\NormalTok{(}
+  \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{28}\NormalTok{, }\DecValTok{45}\NormalTok{, }\DecValTok{29}\NormalTok{, }\DecValTok{26}\NormalTok{,}
+  \DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{2}\NormalTok{,}
+  \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{41}\NormalTok{, }\DecValTok{44}\NormalTok{, }\DecValTok{20}\NormalTok{, }\DecValTok{20}\NormalTok{,}
+  \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{matrix}\NormalTok{(., }\AttributeTok{byrow=}\NormalTok{T, }\AttributeTok{ncol=}\DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \StringTok{\textasciigrave{}}\AttributeTok{colnames\textless{}{-}}\StringTok{\textasciigrave{}}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"therapy"}\NormalTok{, }\StringTok{"gender"}\NormalTok{, }\StringTok{"prog"}\NormalTok{, }\StringTok{"no\_ch"}\NormalTok{, }\StringTok{"partial"}\NormalTok{, }\StringTok{"complete"}\NormalTok{))}
+
+\CommentTok{\# from slides}
+\NormalTok{vfit }\OtherTok{=}\NormalTok{ VGAM}\SpecialCharTok{::}\FunctionTok{vglm}\NormalTok{(}
+  \FunctionTok{cbind}\NormalTok{(prog, no\_ch, partial, complete) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ therapy }\SpecialCharTok{+}\NormalTok{ gender,}
+  \AttributeTok{data=}\NormalTok{data,}
+  \AttributeTok{family=}\FunctionTok{cumulative}\NormalTok{(}\AttributeTok{parallel=}\NormalTok{T)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{a.-1}{%
+\subsubsection{a.)}\label{a.-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(vfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## VGAM::vglm(formula = cbind(prog, no_ch, partial, complete) ~ 
+##     therapy + gender, family = cumulative(parallel = T), data = data)
+## 
+## Coefficients: 
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept):1  -0.1960     0.2947  -0.665  0.50605    
+## (Intercept):2   1.3713     0.3059   4.482 7.38e-06 ***
+## (Intercept):3   2.4221     0.3276   7.393 1.43e-13 ***
+## therapy        -0.5807     0.2119  -2.741  0.00613 ** 
+## gender         -0.5414     0.2953  -1.834  0.06671 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: logitlink(P[Y<=1]), logitlink(P[Y<=2]), 
+## logitlink(P[Y<=3])
+## 
+## Residual deviance: 5.5677 on 7 degrees of freedom
+## 
+## Log-likelihood: -25.5417 on 7 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 5 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Exponentiated coefficients:
+##   therapy    gender 
+## 0.5595152 0.5819358
+\end{verbatim}
+
+As detailed in the summary, the baseline is the final category (see
+docs), i.e.~complete or complete remission. The fit then spits out
+exponentiated coefficients for therapy (indicator switched on for
+sequential, switched off for alternating) and gender (indicator on for
+male, off for female). The interpretation here is as follows: given all
+else, the odds of any sort of response (partial remission through
+progressive disease) for sequential (\texttt{therapy\ =\ 1}) therapy are
+.5595 times those for alternating (\texttt{therapy\ =\ 0}); likewise,
+the odds of any sort of response for males are .5819 times those of
+females, all else given. This casts well on the sequential therapy, as
+the estimated odds of any sort of response decrease with it --
+identically, the odds of a complete remission increase with it.
+
+\hypertarget{b.-1}{%
+\subsubsection{b.)}\label{b.-1}}
+
+Suppose we collapse the remission categories and disease (same or
+worsening), i.e.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_ }\OtherTok{=}\FunctionTok{c}\NormalTok{(}
+  \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{28} \SpecialCharTok{+} \DecValTok{45}\NormalTok{, }\DecValTok{29} \SpecialCharTok{+}  \DecValTok{26}\NormalTok{,}
+  \DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{4} \SpecialCharTok{+}  \DecValTok{12}\NormalTok{, }\DecValTok{5} \SpecialCharTok{+} \DecValTok{2}\NormalTok{,}
+  \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{41} \SpecialCharTok{+} \DecValTok{44}\NormalTok{, }\DecValTok{20} \SpecialCharTok{+}  \DecValTok{20}\NormalTok{,}
+  \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{12} \SpecialCharTok{+} \DecValTok{7}\NormalTok{, }\DecValTok{3} \SpecialCharTok{+} \DecValTok{1}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{matrix}\NormalTok{(., }\AttributeTok{byrow=}\NormalTok{T, }\AttributeTok{ncol=}\DecValTok{4}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \StringTok{\textasciigrave{}}\AttributeTok{colnames\textless{}{-}}\StringTok{\textasciigrave{}}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"therapy"}\NormalTok{, }\StringTok{"gender"}\NormalTok{, }\StringTok{"same\_or\_worse"}\NormalTok{, }\StringTok{"any\_remission"}\NormalTok{))}
+
+\CommentTok{\# from slides}
+\NormalTok{vfit\_ }\OtherTok{=}\NormalTok{ VGAM}\SpecialCharTok{::}\FunctionTok{vglm}\NormalTok{(}
+  \FunctionTok{cbind}\NormalTok{(same\_or\_worse, any\_remission) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ therapy }\SpecialCharTok{+}\NormalTok{ gender,}
+  \AttributeTok{data=}\NormalTok{data\_,}
+  \AttributeTok{family=}\FunctionTok{cumulative}\NormalTok{(}\AttributeTok{parallel=}\NormalTok{T)}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(vfit\_)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## VGAM::vglm(formula = cbind(same_or_worse, any_remission) ~ therapy + 
+##     gender, family = cumulative(parallel = T), data = data_)
+## 
+## Coefficients: 
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.4250     0.3744   3.806 0.000141 ***
+## therapy      -0.5022     0.2457  -2.044 0.040949 *  
+## gender       -0.6543     0.3715  -1.761 0.078171 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Name of linear predictor: logitlink(P[Y<=1]) 
+## 
+## Residual deviance: 0.1192 on 1 degrees of freedom
+## 
+## Log-likelihood: -8.5384 on 1 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 3 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Exponentiated coefficients:
+##   therapy    gender 
+## 0.6051969 0.5197993
+\end{verbatim}
+
+Now, the odds of same-or-worsening under sequential are -- given all
+else -- about .61 times those under alternating. The odds of
+same-or-worsening as a male -- given all else -- are about .52 those for
+a female.
+
+Broadly, the therapy coefficients across both models are similar. As set
+forth by Agresti 8.2.2, this reflects the collapsibility property of
+such cumulative logit models.
+
+\hypertarget{c.-1}{%
+\subsubsection{c.)}\label{c.-1}}
+
+Unde collapsing, we have (lookup in tables above)
+\(\hat\beta_1 / SE_{1} = \frac{-.5022}{2.457} = -2.044.\), whereas
+uncollapsed we have
+\(\hat\beta_1 / SE_{1} = \frac{-.5807}{.2119} = -2.740.\). Indeed, this
+implies the significance of the effect has decreased (against a null
+hypothesis of \(beta_1 = 0\); we're just z-scoring). Hence, a Wald test
+might be less likely to reject and find significance of the
+effect/treatment.
+
+\hypertarget{d.}{%
+\subsubsection{d.)}\label{d.}}
+
+We fit the interacted model
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{vfit\_interact }\OtherTok{=}\NormalTok{ VGAM}\SpecialCharTok{::}\FunctionTok{vglm}\NormalTok{(}
+  \FunctionTok{cbind}\NormalTok{(prog, no\_ch, partial, complete) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ therapy }\SpecialCharTok{*}\NormalTok{ gender,}
+  \AttributeTok{data=}\NormalTok{data,}
+  \AttributeTok{family=}\FunctionTok{cumulative}\NormalTok{(}\AttributeTok{parallel=}\NormalTok{T)}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(vfit\_interact)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## VGAM::vglm(formula = cbind(prog, no_ch, partial, complete) ~ 
+##     therapy * gender, family = cumulative(parallel = T), data = data)
+## 
+## Coefficients: 
+##                Estimate Std. Error z value Pr(>|z|)    
+## (Intercept):1   0.07702    0.39861   0.193   0.8468    
+## (Intercept):2   1.64839    0.41023   4.018 5.86e-05 ***
+## (Intercept):3   2.69784    0.42603   6.332 2.41e-10 ***
+## therapy        -1.07848    0.54980  -1.962   0.0498 *  
+## gender         -0.86461    0.43087  -2.007   0.0448 *  
+## therapy:gender  0.59041    0.59353   0.995   0.3199    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: logitlink(P[Y<=1]), logitlink(P[Y<=2]), 
+## logitlink(P[Y<=3])
+## 
+## Residual deviance: 4.5209 on 6 degrees of freedom
+## 
+## Log-likelihood: -25.0183 on 6 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 5 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Exponentiated coefficients:
+##        therapy         gender therapy:gender 
+##      0.3401121      0.4212172      1.8047266
+\end{verbatim}
+
+Functionally, the interacted model does not improve the fit much:
+whereas the uninteracted model had a residual deviance of 5.5677 on 7
+degrees of freedom, this new fit has a residual deviance of 4.5209 on 6
+degrees of freedom. This gives us a drop-in-deviance test of (5.5677 -
+4.5209) = 1.0468 on a single degree of freedom, the p-value for such a
+test is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pchisq}\NormalTok{(}\FloatTok{5.5677} \SpecialCharTok{{-}} \FloatTok{4.5209}\NormalTok{, }\DecValTok{1}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ F)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.3062452
+\end{verbatim}
+
+so we would fail to reject a null hypothesis that any interaction is
+zero; hence we would likely continue to assume the interaction is zero,
+and stick with the uninteracted model.
+
+Consider what happens in the four variable setup. If we arbitrarily
+choose a baseline of alternating with gender female, and then define
+levels of (Alt. x Female), (Seq. x Female), (Seq. x Male), our
+regression will effectively boil down to: we will have \[
+\beta_1\cdot  \delta(\text{Alt. x Male}) + \beta_2\cdot  \delta(\text{Seq. x Female}) + \beta_3\cdot  \delta(\text{Seq. x Male})
+\] Observe that this is functionally equivalent -- i.e.~it corresponds
+1:1 -- to \[
+\beta_1\cdot \delta(Male) +  \beta_2\delta(Seq) + \beta_4\cdot \delta(Male)\cdot \delta(Seq)
+\] where \(\beta_3 = \beta_1 + \beta_2 + \beta_4\).
+
+\hypertarget{section-2}{%
+\subsection{8.17}\label{section-2}}
+
+Just as in the previous problem, the data sets up nicely for a
+cumulative logit model, as the cholesterol buckets impose a nice ordinal
+structure. We're instructed to use beginning state and treatement/not as
+covariates; I'll go additive for simplicity, but an interaction (as in
+the previous problem) would be fair game as well.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# groups}
+\CommentTok{\# 1 : 3.4; }
+\CommentTok{\# 2 : 3.4{-}4.1; }
+\CommentTok{\# 3 : 4.1{-}4.9; }
+\CommentTok{\# 4: d \textgreater{} 4.9}
+
+\NormalTok{data }\OtherTok{=} \FunctionTok{c}\NormalTok{(}
+    \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{18}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+    \DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{16}\NormalTok{, }\DecValTok{30}\NormalTok{, }\DecValTok{13}\NormalTok{, }\DecValTok{2}\NormalTok{,}
+    \DecValTok{0}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{14}\NormalTok{, }\DecValTok{28}\NormalTok{, }\DecValTok{7}\NormalTok{,}
+    \DecValTok{0}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{22}\NormalTok{,}
+    \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{21}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+    \DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{17}\NormalTok{, }\DecValTok{25}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+    \DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{11}\NormalTok{, }\DecValTok{35}\NormalTok{, }\DecValTok{36}\NormalTok{, }\DecValTok{6}\NormalTok{,}
+    \DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{14}\NormalTok{, }\DecValTok{12}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{matrix}\NormalTok{(}\AttributeTok{byrow=}\NormalTok{T, }\AttributeTok{ncol=}\DecValTok{6}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \StringTok{\textasciigrave{}}\AttributeTok{colnames\textless{}{-}}\StringTok{\textasciigrave{}}\NormalTok{(}
+    \FunctionTok{c}\NormalTok{(}\StringTok{"is\_treatment"}\NormalTok{, }\StringTok{"begin\_group"}\NormalTok{, }\StringTok{"group\_1"}\NormalTok{, }
+      \StringTok{"group\_2"}\NormalTok{, }\StringTok{"group\_3"}\NormalTok{, }\StringTok{"group\_4"}\NormalTok{)}
+\NormalTok{    )}
+
+\NormalTok{vfit\_ldl\_1 }\OtherTok{=}\NormalTok{ VGAM}\SpecialCharTok{::}\FunctionTok{vglm}\NormalTok{(}
+  \FunctionTok{cbind}\NormalTok{(group\_1, group\_2, group\_3, group\_4) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ is\_treatment }\SpecialCharTok{+}\NormalTok{ begin\_group,}
+  \AttributeTok{data=}\NormalTok{data,}
+  \AttributeTok{family=}\FunctionTok{cumulative}\NormalTok{(}\AttributeTok{parallel=}\NormalTok{T)}
+\NormalTok{)}
+
+\NormalTok{vfit\_ldl\_2 }\OtherTok{=}\NormalTok{ VGAM}\SpecialCharTok{::}\FunctionTok{vglm}\NormalTok{(}
+  \FunctionTok{cbind}\NormalTok{(group\_1, group\_2, group\_3, group\_4) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ begin\_group }\SpecialCharTok{+}\NormalTok{ is\_treatment,}
+  \AttributeTok{data=}\NormalTok{data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{begin\_group =} \FunctionTok{as.character}\NormalTok{(begin\_group)),}
+  \AttributeTok{family=}\FunctionTok{cumulative}\NormalTok{(}\AttributeTok{parallel=}\NormalTok{T)}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(vfit\_ldl\_1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## VGAM::vglm(formula = cbind(group_1, group_2, group_3, group_4) ~ 
+##     is_treatment + begin_group, family = cumulative(parallel = T), 
+##     data = data)
+## 
+## Coefficients: 
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept):1   2.5507     0.3435   7.427 1.11e-13 ***
+## (Intercept):2   4.8517     0.4113  11.795  < 2e-16 ***
+## (Intercept):3   7.3108     0.5046  14.489  < 2e-16 ***
+## is_treatment    0.8017     0.2066   3.880 0.000105 ***
+## begin_group    -1.8722     0.1441 -12.992  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: logitlink(P[Y<=1]), logitlink(P[Y<=2]), 
+## logitlink(P[Y<=3])
+## 
+## Residual deviance: 14.543 on 19 degrees of freedom
+## 
+## Log-likelihood: -39.066 on 19 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 4 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Exponentiated coefficients:
+## is_treatment  begin_group 
+##    2.2292601    0.1537787
+\end{verbatim}
+
+Looking at the exponentiated coefficients, we have the following
+interpretation: given all else and for any level of the four ordered
+cholesterol levels, the odds of having an ending cholesterol less than
+or equal to that level among treated patients are about 2.23 times those
+among control patients.
+
+\hypertarget{b.-2}{%
+\subsubsection{b.)}\label{b.-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(vfit\_ldl\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## VGAM::vglm(formula = cbind(group_1, group_2, group_3, group_4) ~ 
+##     begin_group + is_treatment, family = cumulative(parallel = T), 
+##     data = data %>% mutate(begin_group = as.character(begin_group)))
+## 
+## Coefficients: 
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept):1   0.6738     0.3271   2.060 0.039412 *  
+## (Intercept):2   2.9648     0.3694   8.026 1.01e-15 ***
+## (Intercept):3   5.4379     0.4223  12.878  < 2e-16 ***
+## begin_group2   -1.8749     0.3701  -5.066 4.06e-07 ***
+## begin_group3   -3.6972     0.3958  -9.340  < 2e-16 ***
+## begin_group4   -5.6441     0.4661 -12.110  < 2e-16 ***
+## is_treatment    0.7924     0.2097   3.778 0.000158 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: logitlink(P[Y<=1]), logitlink(P[Y<=2]), 
+## logitlink(P[Y<=3])
+## 
+## Residual deviance: 14.4679 on 17 degrees of freedom
+## 
+## Log-likelihood: -39.0285 on 17 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 4 
+## 
+## No Hauck-Donner effect found in any of the estimates
+## 
+## 
+## Exponentiated coefficients:
+## begin_group2 begin_group3 begin_group4 is_treatment 
+##  0.153370198  0.024793796  0.003538291  2.208756477
+\end{verbatim}
+
+Looking at the exponentiated coefficients, we have the following
+interpretation: given all else and for any level of the four ordered
+cholesterol levels, the odds of having an ending cholesterol less than
+or equal to that level among treated patients are about 2.21 times those
+among control patients. This is a remarkably close estimate to that
+obtained in part a, suggesting there may be little difference between
+treating begin group ordinally or as a factor. We largely make the same
+inference about the effect of treatment.
+
+\hypertarget{section-3}{%
+\subsection{8.23}\label{section-3}}
+
+First, we fit the uninformative prior,
+i.e.~\(\alpha, \beta \sim N(0, \sigma=100)\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{suppressMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(rstan))}
+\FunctionTok{suppressMessages}\NormalTok{((}\FunctionTok{library}\NormalTok{(bayesplot)))}
+
+\CommentTok{\# thank you Saskia for copying over the data}
+\NormalTok{data }\OtherTok{=} \FunctionTok{list}\NormalTok{(}
+  \CommentTok{\# race}
+  \AttributeTok{X1 =} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{88}\SpecialCharTok{+}\DecValTok{16}\SpecialCharTok{+}\DecValTok{2}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{54}\SpecialCharTok{+}\DecValTok{7}\SpecialCharTok{+}\DecValTok{5}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{397}\SpecialCharTok{+}\DecValTok{141}\SpecialCharTok{+}\DecValTok{24}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{235}\SpecialCharTok{+}\DecValTok{189}\SpecialCharTok{+}\DecValTok{39}\NormalTok{)}
+\NormalTok{  ),}
+  \CommentTok{\# gender}
+  \AttributeTok{X2 =} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{88}\SpecialCharTok{+}\DecValTok{16}\SpecialCharTok{+}\DecValTok{2}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{54}\SpecialCharTok{+}\DecValTok{7}\SpecialCharTok{+}\DecValTok{5}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{397}\SpecialCharTok{+}\DecValTok{141}\SpecialCharTok{+}\DecValTok{24}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{235}\SpecialCharTok{+}\DecValTok{189}\SpecialCharTok{+}\DecValTok{39}\NormalTok{)}
+\NormalTok{  ),}
+  \CommentTok{\# belief}
+  \AttributeTok{Y =} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{88}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{16}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{), }\CommentTok{\#1=yes, 2=unsure, 3=no}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{54}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{7}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{5}\NormalTok{),}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{397}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{141}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{24}\NormalTok{),}
+    \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{235}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{189}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{39}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{P }\OtherTok{=} \DecValTok{3}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{N }\OtherTok{=} \FunctionTok{length}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{Y)}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{K }\OtherTok{=} \DecValTok{3} \SpecialCharTok{{-}} \DecValTok{1}
+
+
+\NormalTok{stan\_model }\OtherTok{=} \StringTok{"}
+\StringTok{data \{ // data block: observed variables names, types, sizes}
+\StringTok{  int\textless{}lower=1\textgreater{} N;}
+\StringTok{  int\textless{}lower=1\textgreater{} K;}
+\StringTok{  int\textless{}lower=1\textgreater{} P;}
+\StringTok{  real\textless{}lower=0\textgreater{} sigma\_alpha;}
+\StringTok{  real\textless{}lower=0\textgreater{} sigma\_theta;}
+\StringTok{  vector[N] X1; // race}
+\StringTok{  vector[N] X2; // gender}
+\StringTok{  int\textless{}lower=1, upper=3\textgreater{} Y[N];}
+\StringTok{\}}
+\StringTok{parameters \{ // unobserved variables (name, type, size)}
+\StringTok{  vector[K] alpha; // intercept}
+\StringTok{  matrix[K, 2] theta; // coefs}
+\StringTok{  //vector[K] theta1;}
+\StringTok{  //vector[K] theta2;}
+\StringTok{\}}
+\StringTok{model \{}
+\StringTok{  vector[K+1] eta; // TIL you can define stuff like this iter{-}wise}
+\StringTok{  alpha \textasciitilde{} normal(0, sigma\_alpha);}
+\StringTok{  theta[1:K, 1] \textasciitilde{} normal(0, sigma\_theta);}
+\StringTok{  theta[1:K, 2] \textasciitilde{} normal(0, sigma\_theta);}
+\StringTok{  //theta1 \textasciitilde{} normal(0, sigma\_theta);}
+\StringTok{  //theta2 \textasciitilde{} normal(0, sigma\_theta);}
+\StringTok{  }
+\StringTok{  for (i in 1:N)\{ // N outcome values, w/ N corresponding parameter values}
+\StringTok{    for (j in 1:K)\{}
+\StringTok{      eta[j] = alpha[j] + theta[j, 1]*X1[i] + theta[j, 2]*X2[i];}
+\StringTok{     //eta[j] = alpha[j] + theta1[j]*X1[i] + theta2[j]*X2[i];}
+\StringTok{    \}}
+\StringTok{    eta[K+1] = 0; // baseline}
+\StringTok{    Y[i] \textasciitilde{} categorical\_logit(eta); // from slides}
+\StringTok{  \}}
+\StringTok{\}"}
+
+\CommentTok{\# sample: NUTS}
+\NormalTok{stan\_fit\_1 }\OtherTok{=} \FunctionTok{stan}\NormalTok{(}
+  \AttributeTok{model\_code=}\NormalTok{stan\_model,}
+  \AttributeTok{data=}\FunctionTok{append}\NormalTok{(}
+\NormalTok{    data,}
+    \FunctionTok{list}\NormalTok{(}\AttributeTok{sigma\_alpha=}\FloatTok{100.}\NormalTok{, }\AttributeTok{sigma\_theta=}\FloatTok{100.}\NormalTok{)}
+\NormalTok{  ),}
+  \AttributeTok{chains=}\DecValTok{4}\NormalTok{,}
+  \AttributeTok{iter=}\DecValTok{5000}\NormalTok{,}
+  \AttributeTok{warmup=}\DecValTok{2000}\NormalTok{,}
+  \AttributeTok{thin=}\DecValTok{1}\NormalTok{,}
+  \AttributeTok{seed=}\DecValTok{100}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Trace:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stan\_trace}\NormalTok{(stan\_fit\_1)}
+\end{Highlighting}
+\end{Shaded}
+
+Autocorrelation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mcmc\_acf}\NormalTok{(stan\_fit\_1, }\AttributeTok{eval=}\ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Looking at traceplots and autocorrelations, convergence passes muster.
+Posterior parameters are summarized as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(stan\_fit\_1)}\SpecialCharTok{$}\NormalTok{summary}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                    mean     se_mean        sd         2.5%          25%
+## alpha[1]      1.8036385 0.002549095 0.1704029    1.4804563    1.6877515
+## alpha[2]      1.5400749 0.002601180 0.1738637    1.2103200    1.4205425
+## theta[1,1]    0.7346790 0.005748433 0.4209829   -0.0344862    0.4422243
+## theta[1,2]    1.0382527 0.003858210 0.2603955    0.5378338    0.8637058
+## theta[2,1]   -0.4315445 0.006486733 0.4630389   -1.2982529   -0.7492013
+## theta[2,2]    0.3112586 0.004003428 0.2707089   -0.2037328    0.1267926
+## lp__       -933.9119786 0.025997989 1.7557219 -938.1301027 -934.8746747
+##                     50%          75%        97.5%    n_eff     Rhat
+## alpha[1]      1.7984994    1.9195051    2.1524122 4468.705 1.000754
+## alpha[2]      1.5371634    1.6550034    1.8859748 4467.629 1.000638
+## theta[1,1]    0.7159359    1.0047589    1.6200980 5363.272 1.000174
+## theta[1,2]    1.0358074    1.2125758    1.5623270 4555.074 1.000370
+## theta[2,1]   -0.4479603   -0.1272903    0.5221396 5095.454 1.000323
+## theta[2,2]    0.3070692    0.4961187    0.8423948 4572.368 1.000281
+## lp__       -933.5816987 -932.6166319 -931.5167904 4560.705 1.000002
+\end{verbatim}
+
+Here, \texttt{beta{[}1,\ 2{]}} is our parameter of interest, as it
+corresponds to \texttt{Gender\ =\ Yes\ =\ Female\ =\ j\ =\ 1}. We we
+have posterior {[}q2.5, mean, q97.5{]}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(stan\_fit\_1)}\SpecialCharTok{$}\NormalTok{summary[}\DecValTok{4}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{8}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      2.5%      mean     97.5% 
+## 0.5378338 1.0382527 1.5623270
+\end{verbatim}
+
+Next, we attempt a fit, albeit with standard Gaussian priors,
+i.e.~\(\alpha, \beta \sim N(0, \sigma=1)\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# sample: NUTS}
+\NormalTok{stan\_fit\_2 }\OtherTok{=} \FunctionTok{stan}\NormalTok{(}
+  \AttributeTok{model\_code=}\NormalTok{stan\_model,}
+  \AttributeTok{data=}\FunctionTok{append}\NormalTok{(}
+\NormalTok{    data,}
+    \FunctionTok{list}\NormalTok{(}\AttributeTok{sigma\_alpha=}\FloatTok{1.}\NormalTok{, }\AttributeTok{sigma\_theta=}\FloatTok{1.}\NormalTok{)}
+\NormalTok{  ),}
+  \AttributeTok{chains=}\DecValTok{4}\NormalTok{,}
+  \AttributeTok{iter=}\DecValTok{5000}\NormalTok{,}
+  \AttributeTok{warmup=}\DecValTok{2500}\NormalTok{,}
+  \AttributeTok{thin=}\DecValTok{1}\NormalTok{,}
+  \AttributeTok{seed=}\DecValTok{123}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Again, all good on convergence check. Trace:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stan\_trace}\NormalTok{(stan\_fit\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+Autocorrelation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mcmc\_acf}\NormalTok{(stan\_fit\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+Now, our posterior q2.5/mean/q97.5/SD is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(stan\_fit\_2)}\SpecialCharTok{$}\NormalTok{summary[}\DecValTok{4}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{3}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      2.5%      mean     97.5%        sd 
+## 0.5827874 1.0376281 1.5070288 0.2368063
+\end{verbatim}
+
+To recap, we have the following q2.5/mean/q97.5 tuples across all three
+of our models:
+
+\hypertarget{i.-uninformative-sim-n0-100}{%
+\paragraph{\texorpdfstring{i.) Uninformative
+(\(\sim N(0, 100)\)):}{i.) Uninformative (\textbackslash sim N(0, 100)):}}\label{i.-uninformative-sim-n0-100}}
+
+q2.5/mean/q97.5/SD:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(stan\_fit\_1)}\SpecialCharTok{$}\NormalTok{summary[}\DecValTok{4}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{3}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      2.5%      mean     97.5%        sd 
+## 0.5378338 1.0382527 1.5623270 0.2603955
+\end{verbatim}
+
+\hypertarget{ii.-standard-gaussian-prior-sim-n0-1}{%
+\paragraph{\texorpdfstring{ii.) Standard Gaussian Prior
+(\(\sim N(0, 1)\)):}{ii.) Standard Gaussian Prior (\textbackslash sim N(0, 1)):}}\label{ii.-standard-gaussian-prior-sim-n0-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(stan\_fit\_2)}\SpecialCharTok{$}\NormalTok{summary[}\DecValTok{4}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{3}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      2.5%      mean     97.5%        sd 
+## 0.5827874 1.0376281 1.5070288 0.2368063
+\end{verbatim}
+
+Posterior SD: 0.9242415, 0.4694007, 0
+
+\hypertarget{iii.-mle-propto-1-table}{%
+\paragraph{\texorpdfstring{iii.) MLE (\(\propto 1\)) --
+Table}{iii.) MLE (\textbackslash propto 1) -- Table}}\label{iii.-mle-propto-1-table}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{c}\NormalTok{(}\FloatTok{1.044} \SpecialCharTok{{-}} \FloatTok{1.96} \SpecialCharTok{*}\NormalTok{ .}\DecValTok{259}\NormalTok{, }\FloatTok{1.044}\NormalTok{, }\FloatTok{1.044} \SpecialCharTok{+} \FloatTok{1.96} \SpecialCharTok{*}\NormalTok{ .}\DecValTok{259}\NormalTok{, .}\DecValTok{259}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.53636 1.04400 1.55164 0.25900
+\end{verbatim}
+
+In general, the results are fairly close (largely because with 1197 data
+points, the prior gets swamped). However, we do see that the
+uninformative prior is pretty close to the MLE fit -- this makes sense,
+because as \(\sigma\to\infty\), a normal tends towards an improper flat
+prior, which is the MLE fit. So there is a natural connection there --
+\(\sigma\)'s getting big and starting to look flat, hence the MLE
+similarity (roughly .26 SD). In contrast, the standard Gaussian prior
+imposes a stricter prior belief (i.e.~stronger L2 regularization), so
+coefficients should be shrunk a tad bit closer to zero, and more
+conspicuously, the posterior interval should be narrower. Indeed, the
+standard prior has a narrower posterior credible interview (.23 SD), in
+support of the previous point.
+
+\hypertarget{section-4}{%
+\subsection{9.7}\label{section-4}}
+
+Make data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_9}\FloatTok{.7} \OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{number=}\FunctionTok{c}\NormalTok{(}\DecValTok{1105}\NormalTok{, }\DecValTok{411111}\NormalTok{, }\DecValTok{4624}\NormalTok{, }\DecValTok{157342}\NormalTok{, }
+      \DecValTok{14}\NormalTok{, }\DecValTok{483}\NormalTok{, }\DecValTok{497}\NormalTok{, }\DecValTok{1008}\NormalTok{),}
+  \AttributeTok{seatbelt=}\FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{2}\NormalTok{),}
+  \AttributeTok{eject=}\FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{4}\NormalTok{),}
+  \AttributeTok{fatal=}\FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{4}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{))}
+\NormalTok{)}
+
+\NormalTok{data\_9}\FloatTok{.7}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   number seatbelt eject fatal
+## 1   1105        1     1     0
+## 2 411111        1     0     0
+## 3   4624        0     1     0
+## 4 157342        0     0     0
+## 5     14        1     1     1
+## 6    483        1     0     1
+## 7    497        0     1     1
+## 8   1008        0     0     1
+\end{verbatim}
+
+\hypertarget{a.-2}{%
+\subsubsection{a.)}\label{a.-2}}
+
+Using \(S\in\{1, 0\}\) for seatbelt/not use, \(E\in\{1, 0\}\) for
+ejection/not, \(F\in\{1, 0\}\) for fatality/not, a natural choice of
+model is a first order interaction model,
+i.e.~\texttt{\textasciitilde{}\ S*E\ +\ S*F\ +\ E*F}, corresponding to
+(see Table 9.13) \(\pi_{sef} = \psi_{se}\phi_{ef} \omega_{sf}\) setup.
+Using \texttt{glm()}, and specifically the \texttt{family=poisson()}
+plug-in/argument to do the necessary Newton-Raphson for us, we then have
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glm}\NormalTok{(}
+\NormalTok{  number }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ seatbelt}\SpecialCharTok{*}\NormalTok{eject }\SpecialCharTok{+}\NormalTok{ seatbelt}\SpecialCharTok{*}\NormalTok{fatal }\SpecialCharTok{+}\NormalTok{ eject}\SpecialCharTok{*}\NormalTok{fatal,}
+  \AttributeTok{data=}\NormalTok{data\_9}\FloatTok{.7}\NormalTok{,}
+  \AttributeTok{family=}\StringTok{"poisson"}
+\NormalTok{) }\OtherTok{{-}\textgreater{}}\NormalTok{ fit\_ll}
+
+\NormalTok{fit\_ll}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:  glm(formula = number ~ 1 + seatbelt * eject + seatbelt * fatal + 
+##     eject * fatal, family = "poisson", data = data_9.7)
+## 
+## Coefficients:
+##    (Intercept)        seatbelt           eject           fatal  seatbelt:eject  
+##        11.9661          0.9605         -3.5256         -5.0436         -2.3996  
+## seatbelt:fatal     eject:fatal  
+##        -1.7173          2.7978  
+## 
+## Degrees of Freedom: 7 Total (i.e. Null);  1 Residual
+## Null Deviance:       1625000 
+## Residual Deviance: 2.854     AIC: 93.85
+\end{verbatim}
+
+\hypertarget{b.-3}{%
+\subsubsection{b.)}\label{b.-3}}
+
+Here, we replicate the rationale of 9.5.1. Much like Agresti's example,
+our log-linear model is based off of \texttt{(SE,\ SF,\ EF)}. Further,
+as demonstrated in 9.5.1, the logit for injury under this log-linear
+model is then \begin{align*}
+\frac{
+P(F=1|S, E)
+}{
+P(F=0|S, E)
+}
+&= 
+\log\left(
+\frac{\mu_{f=1, s, e}}{\mu_{f=0, s, e}}
+\right)\\
+&=
+\log(\mu_{f=1, s, e}) - \log(\mu_{f=0, s, e})\\
+&=
+\bigg(\lambda + \lambda^F\cdot 1 + \lambda^SS + \lambda^EE + \lambda^{SE}SE + \lambda^{EF}E\cdot 1 + \lambda^{SF}S\cdot 1\bigg) - 
+\\
+&\hspace{1cm}
+\bigg(
+\lambda + \lambda^F\cdot 0 + \lambda^SS + \lambda^EE + \lambda^{SE}SE + \lambda^{EF}E\cdot 0 + \lambda^{SF}S\cdot 0 \bigg)\\
+&=
+\bigg(\lambda + \lambda^F + \lambda^SS + \lambda^EE + \lambda^{SE}SE + \lambda^{EF}E + \lambda^{SF}S\bigg) - \\
+&\hspace{1cm}\bigg(\lambda + \lambda^SS + \lambda^EE + \lambda^{SE}SE\bigg) \\
+&=
+\lambda^F + \lambda^{EF}E + \lambda^{SF}S.
+\end{align*} This is a logistic regression (logit is modeled linearly),
+where \(\lambda^F\) is the intercept, \(\lambda^{EF}\) is the effect for
+E, and \(\lambda^{SE}\) is the effect for S. Of course, in this logistic
+regression, we'll need to weigh by number observed:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glm}\NormalTok{(}
+\NormalTok{  fatal }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ eject }\SpecialCharTok{+}\NormalTok{ seatbelt,}
+  \AttributeTok{data=}\NormalTok{data\_9}\FloatTok{.7}\NormalTok{,}
+  \AttributeTok{family=}\StringTok{"binomial"}\NormalTok{,}
+  \AttributeTok{weights=}\NormalTok{number}
+\NormalTok{) }\OtherTok{{-}\textgreater{}}\NormalTok{ fit\_logit}
+
+\NormalTok{fit\_logit}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:  glm(formula = fatal ~ 1 + eject + seatbelt, family = "binomial", 
+##     data = data_9.7, weights = number)
+## 
+## Coefficients:
+## (Intercept)        eject     seatbelt  
+##      -5.044        2.798       -1.717  
+## 
+## Degrees of Freedom: 7 Total (i.e. Null);  5 Residual
+## Null Deviance:       26670 
+## Residual Deviance: 23100     AIC: 23110
+\end{verbatim}
+
+Here, our interpretation goes as follows: all else held constant
+(i.e.~given seatbelt status), being ejected (as opposed to not)
+increases one's odds of fatality by a factor of 16.4117903; similarly,
+all else held constant (i.e.~given ejection status), not wearing a belt
+(as opposed to not) decreases one's odds of fatality by a factor of
+5.5678. Crucially, we should recognize these coefficients (as
+interactions) from our log-linear fit above.
+
+\hypertarget{c.-2}{%
+\subsubsection{c.)}\label{c.-2}}
+
+Notably, our deviance isn't two big, at -2.85 (see model output above).
+However, for dissimilarity, we have
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(data\_9}\FloatTok{.7}\SpecialCharTok{$}\NormalTok{number }\SpecialCharTok{{-}} \FunctionTok{predict}\NormalTok{(fit\_ll, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{))) }\SpecialCharTok{/} 
+\NormalTok{  (}\DecValTok{2} \SpecialCharTok{*} \FunctionTok{sum}\NormalTok{(data\_9}\FloatTok{.7}\SpecialCharTok{$}\NormalTok{number))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4.767967e-05
+\end{verbatim}
+
+As this is pretty close to zero, the model looks like it's in decent
+shape.
+
+\hypertarget{section-5}{%
+\subsection{9.8}\label{section-5}}
+
+\hypertarget{a.-3}{%
+\subsubsection{a.)}\label{a.-3}}
+
+Just as in the previous problem, we can reframe this problem as a
+logistic regression, i.e.~\texttt{I\ \textasciitilde{}\ G\ +\ L\ +\ S},
+where here the terms are reported (based on problem setup) as
+\texttt{1\ =\ no\ injury} and \texttt{0\ =\ injury}. Hence, the
+\texttt{IG=0.58} term implies that the odds of no injury for females,
+given all else (\texttt{L,\ S}) is .58 times that for males; thus,
+females are, given other features, less likely to be non-injured,
+i.e.~more likely to be injured.
+
+Similarly, we have that the odds of no-injury in an urban setting is
+\texttt{IL=2.13} times that of no-injury in a rural setting (perhaps due
+to higher traveling speeds in rural settings?), indicating that injury
+is more common in rural settings. So again, given other features
+(\texttt{G,\ S}), the rural crash is more likely to cause injury by this
+coefficient.
+
+Lastly, given gender and location (\texttt{G,\ L}), we see that the odds
+of no-injury for seatbelt users are \texttt{IS=.44} times those of
+non-seatbelt users; in other words, given everything else, it's less
+injurious to wear a seatbelt, and hence more injurious to not wear a
+seatbelt.
+
+As the model construction here features no interaction terms between
+\texttt{I} and two or more of the \texttt{S,\ L,\ G} features, the
+logistic regression has no interaction terms -- recall it's LME form is
+\texttt{I\ \textasciitilde{}\ G\ +\ L\ +\ S}. Hence, the
+\texttt{G,\ L,\ S} components work additively, so female + rural +
+no-seatbelt sums up to the most at-risk group, at least according to
+this model.
+
+\hypertarget{b.-4}{%
+\subsubsection{b.)}\label{b.-4}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# setup non{-}injury as Y=1 target}
+\NormalTok{data\_9}\FloatTok{.8} \OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \CommentTok{\# G   L    S   N     I}
+  \StringTok{"F"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{7287}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"F"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{996}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"F"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{11587}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"F"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{759}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"F"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{3246}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"F"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{973}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"F"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{6134}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"F"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{757}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  
+  \StringTok{"M"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{10381}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"M"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{812}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"M"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{10969}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"M"}\NormalTok{, }\StringTok{"U"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{380}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"M"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{6123}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"M"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{1084}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+  
+  \StringTok{"M"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{6693}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+  \StringTok{"M"}\NormalTok{, }\StringTok{"R"}\NormalTok{, }\StringTok{"Y"}\NormalTok{, }\DecValTok{513}\NormalTok{, }\DecValTok{0}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{matrix}\NormalTok{(., }\AttributeTok{ncol=}\DecValTok{5}\NormalTok{, }\AttributeTok{byrow=}\NormalTok{T) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \StringTok{\textasciigrave{}}\AttributeTok{colnames\textless{}{-}}\StringTok{\textasciigrave{}}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"Gen"}\NormalTok{, }\StringTok{"Loc"}\NormalTok{, }\StringTok{"StBlt"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\StringTok{"Inj"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate\_at}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"N"}\NormalTok{, }\StringTok{"Inj"}\NormalTok{), as.numeric)}
+\CommentTok{\# relevel to match problem interpretation}
+\NormalTok{data\_9}\FloatTok{.8}\SpecialCharTok{$}\NormalTok{StBlt }\OtherTok{=} \FunctionTok{relevel}\NormalTok{(}\FunctionTok{as.factor}\NormalTok{(data\_9}\FloatTok{.8}\SpecialCharTok{$}\NormalTok{StBlt), }\StringTok{"Y"}\NormalTok{)}
+\NormalTok{data\_9}\FloatTok{.8}\SpecialCharTok{$}\NormalTok{Gen }\OtherTok{=} \FunctionTok{relevel}\NormalTok{(}\FunctionTok{as.factor}\NormalTok{(data\_9}\FloatTok{.8}\SpecialCharTok{$}\NormalTok{Gen), }\StringTok{"F"}\NormalTok{)}
+
+\FunctionTok{glm}\NormalTok{(}
+\NormalTok{  N }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Gen }\SpecialCharTok{*}\NormalTok{ Loc }\SpecialCharTok{*}\NormalTok{ StBlt }\SpecialCharTok{+}\NormalTok{ Gen }\SpecialCharTok{*}\NormalTok{ Inj }\SpecialCharTok{+}\NormalTok{ Inj }\SpecialCharTok{*}\NormalTok{ Loc }\SpecialCharTok{+}\NormalTok{ Inj}\SpecialCharTok{*}\NormalTok{StBlt, }
+  \AttributeTok{data=}\NormalTok{data\_9}\FloatTok{.8}\NormalTok{,}
+  \AttributeTok{family=}\StringTok{"poisson"}
+\NormalTok{) }\OtherTok{{-}\textgreater{}}\NormalTok{ fit}
+
+\NormalTok{fit}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{coef}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{exp}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      (Intercept)             GenM             LocU           StBltN 
+##      797.4978976        0.6374392        0.8945202        1.2092047 
+##              Inj        GenM:LocU      GenM:StBltN      LocU:StBltN 
+##        7.6407751        0.8571315        1.7192054        1.1706036 
+##         GenM:Inj         LocU:Inj       StBltN:Inj GenM:LocU:StBltN 
+##        1.7243138        2.1341283        0.4417119        0.8793430
+\end{verbatim}
+
+In looking at the exponentiated coefficients above -- that is, the
+conditional fitted odds ratios -- we indeed see \texttt{SI=.4417}, as
+given by \texttt{StBltN:Inj}. Further, when it is a female, each of the
+\texttt{GenM} indicators zero out/are switched off, so the conditional
+odds ratio derived from \texttt{GLS} is just \texttt{LS=1.1706} (as the
+\texttt{G=Female} specification switches off all other indicators and
+reduces conditional odds ratio to a single \(\hat\lambda\),
+i.e.~\(exp(-0.8170974 + 0 - 0 - 0)\)). However, when \texttt{G=Male},
+those indicators switch back on, and we look at the un-exponentiated
+coefficients to derive conditional odds ratios from the familiar
+\(\exp(\hat\lambda_{11} + \ldots -\hat\lambda_{21})\) formula. Note that
+in the fit, we have:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coef}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      (Intercept)             GenM             LocU           StBltN 
+##        6.6814792       -0.4502964       -0.1114678        0.1899628 
+##              Inj        GenM:LocU      GenM:StBltN      LocU:StBltN 
+##        2.0334991       -0.1541640        0.5418622        0.1575195 
+##         GenM:Inj         LocU:Inj       StBltN:Inj GenM:LocU:StBltN 
+##        0.5448292        0.7580583       -0.8170974       -0.1285802
+\end{verbatim}
+
+Hence, by including the \texttt{GLS} term switched on for
+\texttt{G=Male} into the log odds ratio, we recover the desired ratio
+via
+\texttt{exp(LocU:StBltN\ -\ GenM:LocU:StBltN)\ =\ exp(0.1575195\ -\ 0.1285802)=1.029}.
+
+\hypertarget{c.-3}{%
+\subsubsection{c.)}\label{c.-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# a bit of data munging}
+\CommentTok{\# Seatbelt already factored to first level == seatbelt}
+\NormalTok{data\_9}\FloatTok{.8}\NormalTok{\_ }\OtherTok{=}\NormalTok{ data\_9}\FloatTok{.8} \SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{S=}\FunctionTok{ifelse}\NormalTok{(StBlt}\SpecialCharTok{==}\StringTok{"Y"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+
+\NormalTok{fit\_a }\OtherTok{=} \FunctionTok{glm}\NormalTok{(S }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Gen }\SpecialCharTok{+}\NormalTok{ Loc, }\AttributeTok{data=}\NormalTok{data\_9}\FloatTok{.8}\NormalTok{\_, }\AttributeTok{weights=}\NormalTok{N, }\AttributeTok{family=}\StringTok{"binomial"}\NormalTok{)}
+\NormalTok{data\_9}\FloatTok{.8}\NormalTok{\_}\SpecialCharTok{$}\NormalTok{S\_hat }\OtherTok{=} \FunctionTok{predict}\NormalTok{(fit\_a, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{)}
+\NormalTok{fit\_b }\OtherTok{=} \FunctionTok{glm}\NormalTok{(Inj }\SpecialCharTok{\textasciitilde{}}\NormalTok{ S }\SpecialCharTok{+}\NormalTok{ Gen }\SpecialCharTok{+}\NormalTok{ Loc, }\AttributeTok{data=}\NormalTok{data\_9}\FloatTok{.8}\NormalTok{\_, }\AttributeTok{weights=}\NormalTok{N, }\AttributeTok{family=}\StringTok{"binomial"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The composite model is sensible here, as it allows us to play ``choose
+your own adventure'' to understand and make inferences about the
+decision/action sequence of a car crash. Specifically, we can use gender
+and location to predict whether or not someone was likely wearing a
+seatbelt. This is the first step in the sequence. Then, conditioned on
+this first step information, we can leap to the second step, to predict
+injury. In short, the composite approach makes understanding the chain
+of events much more interpretable: we can first ask, ``was this person
+wearing a seatbelt when they crashed?'', followed by ``if so, how did
+that change their chances of injury?'' In this way, we can chain our
+inference/predictions.
+
+Coefficients for the first model (the intermediate/first leap) are as
+follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(fit\_a)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = S ~ Gen + Loc, family = "binomial", data = data_9.8_, 
+##     weights = N)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -119.781   -51.767    -5.257    40.201   123.500  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  0.45195    0.01550   29.15   <2e-16 ***
+## GenM        -0.42387    0.01551  -27.32   <2e-16 ***
+## LocU        -0.03227    0.01598   -2.02   0.0434 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 94538  on 15  degrees of freedom
+## Residual deviance: 93785  on 13  degrees of freedom
+## AIC: 93791
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+
+\begin{itemize}
+\item
+  \texttt{genM}: all else constant, male occupants had odds of wearing a
+  seatbelt that were 0.654509 times those of female occupants. That is,
+  they were less likely.
+\item
+  \texttt{LocU}: all else constant, urban crashes had odds of wearing a
+  seatbelt that were 0.9682451 times those of rural crashes.
+\end{itemize}
+
+Coefficients for the second model (the second leap, as conditioned on
+the first leap) are as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(fit\_b)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = Inj ~ S + Gen + Loc, family = "binomial", data = data_9.8_, 
+##     weights = N)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -65.79  -58.98  -11.46   39.16   44.07  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  1.21640    0.02649   45.92   <2e-16 ***
+## S            0.81710    0.02765   29.55   <2e-16 ***
+## GenM         0.54483    0.02727   19.98   <2e-16 ***
+## LocU         0.75806    0.02697   28.11   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 41987  on 15  degrees of freedom
+## Residual deviance: 40082  on 12  degrees of freedom
+## AIC: 40090
+## 
+## Number of Fisher Scoring iterations: 6
+\end{verbatim}
+
+\begin{itemize}
+\item
+  \texttt{genM}: all else constant, male occupants had odds of injury
+  that were 1.7243152 times those of female occupants.
+\item
+  \texttt{LocU}: all else constant, urban crashes had odds of injury
+  that were 2.134132 times those of rural crashes.
+\item
+  \texttt{S}: all else constant, crashes in which the occupant was
+  unbelted (S=1) had odds of injury that were 2.2639249 times as those
+  wearing seat belts.
+\end{itemize}
+
+\hypertarget{section-6}{%
+\subsection{9.20}\label{section-6}}
+
+We have \(P(X|Y, Z) \overset{(1)}{=} P(X|Z) \overset{(2)}{=} P(X)\), by
+the conditional (first equality) and marginal independence (second
+equality) suppositions. Accordingly, for any \(X=x, Y=y, Z=z\), we are
+guaranteed: \begin{align*}
+p(x|y)
+&=
+\int_{dZ} p(x, z|y)d\mu(z) \\
+&=
+\int_{dZ} p(x|y, z)p(z)d\mu(z) \\
+&=
+\int_{dZ} p(x|z)p(z)d\mu(z) \\
+&=
+\int_{dZ} p(x)p(z)d\mu(z) \\
+&=
+p(x) \int_{dZ} p(z)d\mu(z) \\
+&=
+p(x)\cdot 1 \\
+&=
+p(x),
+\end{align*} as desired. The steps are justified by (i) introducing a
+nuisance parameter \(z\) to marginalize over; (ii) conditional
+probability property/algebra; (iii) conditional independence; (iv)
+marginal independence; (v) and the remainder by integration of densities
+over their support. Hence, we see that \(P(X|Y) = P(X)\), satisfying the
+desired marginal independence.
+
+\hypertarget{section-7}{%
+\subsection{9.25}\label{section-7}}
+
+\hypertarget{a.-4}{%
+\subsubsection{a.)}\label{a.-4}}
+
+As set forth in Table 9.1, and more generally in Section 9.2.1,
+conditional independence holds between \(X\) and \(Y\) if there exists
+no \(\lambda^{XY}\) interaction term (intuitively this makes sense; we
+effectively showed this in the homogenous association model in HW1).
+Hence, for our model to maintain this desired conditional independence,
+it cannot have such an interaction. And \texttt{(WXZ,\ WYZ)}, which
+amounts to a LME formula of the form
+\texttt{\textasciitilde{}\ 1\ +\ W\ +\ X\ +\ Z\ +\ Y\ +\ WX\ +\ WZ\ +\ XZ\ +\ WY\ +\ YZ\ +\ WXZ\ +\ WYZ}
+contains all possible terms but for those that have an \texttt{X,\ Y}
+interaction -- hence it is the most general model here.
+
+\hypertarget{b.-5}{%
+\subsubsection{b.)}\label{b.-5}}
+
+As the above is most general, we need only to remove the three factor
+interactions, to wit \texttt{WXZ} and \texttt{WYZ}. This gives
+\texttt{\textasciitilde{}\ 1\ +\ W\ +\ X\ +\ Z\ +\ Y\ +\ WX\ +\ WZ\ +\ XZ\ +\ WY\ +\ YZ},
+or \texttt{(WX,\ WZ,\ XZ,\ WY,\ YZ)} in textbook notation.
+
+\hypertarget{section-8}{%
+\subsection{10.19}\label{section-8}}
+
+The joint density for the \texttt{(WX,\ XY,\ YZ)} loglinear model has
+joint density: \[
+p(w, x, y, z) \propto \exp\left(\lambda + \lambda_ww + \lambda_xx + \lambda_yy + \lambda_zz
++ \lambda_{wx}wx + \lambda_{xy}xy + \lambda_{yz}yz
+\right)
+\] First, for \(W|X, Y\), we have (just dropping constants here) \[
+p(w|x, y)
+\propto
+\exp\left(\lambda_ww 
++ \lambda_{wx}wx
+\right)
+\] and then identically for \(Z|X, Y\). \[
+p(z|x, y)
+\propto
+\exp\left(\lambda_zz+ \lambda_{yz}yz
+\right)
+\] Then, we have (again dropping constants) \[
+p(w, z |x, y)
+\propto
+\exp\left(\lambda_ww + \lambda_zz+ \lambda_{yz}yz + \lambda_{wx}wx
+\right)
+=
+\exp\left(\lambda_ww + \lambda_{wx}wx\right)\cdot\exp\left(\lambda_zz+ \lambda_{yz}yz\right)
+=
+p(w|x, y)p(z|x, y)
+\] For the \(|X\) case (and identically the \(|Y\) case too), a similar
+proof holds: First, for \(W|X, Y\), we have (just dropping constants
+here) \[
+p(w|x)
+\propto
+\exp\left(\lambda_ww 
++ \lambda_{wx}wx
+\right)
+\] and then \[
+p(z|x, y)
+\propto
+\exp\left(\lambda_zz+ \lambda'_{yz}yz
+\right)
+\] where the \(\lambda'_{yz}z\) falls out during the process of
+integrating out \(y\),
+i.e.~\(\exp(\lambda'_{yz}yz)\propto \int_Y \exp(\lambda_{yz}yz)dy\).
+
+Then, we have (again dropping constants) \begin{align*}
+p(w, z |x)
+\propto
+\int_Y
+\exp\left(\lambda_ww + \lambda_zz+ \lambda_{yz}yz + \lambda_{wx}wx
+\right)dy \\
+\propto
+\exp\left(\lambda_ww + \lambda_zz+ \lambda_{wx}wx
+\right)
+\int_Y\exp(\lambda_{yz})dy \\
+\propto
+\exp\left(\lambda_ww + \lambda_zz+ \lambda_{wx}wx + \lambda'_{yz}yz
+\right) \\
+=
+\exp\left(\lambda_ww + \lambda_{wx}wx 
+\right)\exp\left( \lambda_zz + \lambda'_{yz}yz
+\right).
+\end{align*} As desired. the \(|Y\) case holds identically. More
+generally, we see that because the graph is \[
+W <--> X <--> Y <--> Z
+\] In this graph, X and Y are in the middle, effectively splitting W and
+Z. Thus, if we condition on either (or both), we effectively ``break''
+the graph in half and separate W and Z, giving us the conditional
+independence.
+
+\hypertarget{digit-logistic-regression}{%
+\subsection{Digit Logistic Regression}\label{digit-logistic-regression}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{suppressMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(dplyr))}
+\FunctionTok{suppressMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(stringr))}
+\FunctionTok{suppressMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(glmnet))}
+\NormalTok{sigmoid }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(z)\{}\FunctionTok{exp}\NormalTok{(z) }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{+} \FunctionTok{exp}\NormalTok{(z))\}}
+
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\CommentTok{\# Part A}
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\NormalTok{read\_digits }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(zip\_obj)\{}
+  \FunctionTok{lapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(zip\_obj),  }
+         \ControlFlowTok{function}\NormalTok{(i)\{}
+\NormalTok{           zip\_rows }\OtherTok{=}\NormalTok{ zip\_obj[i, ] }\SpecialCharTok{\%\textgreater{}\%} 
+             \FunctionTok{str\_split}\NormalTok{(., }\StringTok{" "}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+             \FunctionTok{unlist}\NormalTok{() }
+           \CommentTok{\# sometimes it catches an extra ""}
+           \ControlFlowTok{if}\NormalTok{ (zip\_rows[}\FunctionTok{length}\NormalTok{(zip\_rows)] }\SpecialCharTok{==} \StringTok{""}\NormalTok{)\{}
+\NormalTok{             zip\_rows }\OtherTok{=}\NormalTok{ zip\_rows[}\DecValTok{1}\SpecialCharTok{:}\NormalTok{(}\FunctionTok{length}\NormalTok{(zip\_rows) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)]}
+\NormalTok{           \}}
+           \FunctionTok{as.numeric}\NormalTok{(zip\_rows)}
+\NormalTok{         \}}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{do.call}\NormalTok{(}\StringTok{"rbind"}\NormalTok{, .) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+    \StringTok{\textasciigrave{}}\AttributeTok{colnames\textless{}{-}}\StringTok{\textasciigrave{}}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"digit"}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(}\StringTok{"X"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{256}\NormalTok{))) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{filter}\NormalTok{(digit }\SpecialCharTok{==} \FloatTok{6.} \SpecialCharTok{|}\NormalTok{ digit }\SpecialCharTok{==} \FloatTok{8.}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{y=}\FunctionTok{ifelse}\NormalTok{(digit }\SpecialCharTok{==} \FloatTok{6.}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+\NormalTok{\}}
+
+\NormalTok{zip\_train }\OtherTok{=} \FunctionTok{read\_digits}\NormalTok{(}\FunctionTok{read.delim2}\NormalTok{(}\StringTok{"/Users/IKleisle/Downloads/zip\_train.txt"}\NormalTok{)) }
+\NormalTok{zip\_test }\OtherTok{=} \FunctionTok{read\_digits}\NormalTok{(}\FunctionTok{read.delim2}\NormalTok{(}\StringTok{"/Users/IKleisle/Downloads/zip\_test.txt"}\NormalTok{))}
+
+
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\CommentTok{\# Part B}
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\CommentTok{\# letting glmnet decide the lambda sequence, as instructed}
+\NormalTok{fit\_lasso }\OtherTok{=} \FunctionTok{cv.glmnet}\NormalTok{(}
+  \AttributeTok{x=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{(),}
+  \AttributeTok{y=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(y),}
+  \AttributeTok{family=}\StringTok{"binomial"}\NormalTok{,}
+  \AttributeTok{alpha=}\DecValTok{1}
+\NormalTok{)}
+
+\NormalTok{fit\_ridge }\OtherTok{=} \FunctionTok{cv.glmnet}\NormalTok{(}
+  \AttributeTok{x=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{(),}
+  \AttributeTok{y=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(y),}
+  \AttributeTok{family=}\StringTok{"binomial"}\NormalTok{,}
+  \AttributeTok{alpha=}\DecValTok{0}
+\NormalTok{)}
+
+\NormalTok{fit\_enet }\OtherTok{=} \FunctionTok{cv.glmnet}\NormalTok{(}
+  \AttributeTok{x=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{(),}
+  \AttributeTok{y=}\NormalTok{zip\_train }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(y),}
+  \AttributeTok{family=}\StringTok{"binomial"}\NormalTok{,}
+  \AttributeTok{alpha=}\FloatTok{0.5}
+\NormalTok{)}
+
+\DocumentationTok{\#\#\# extract lambda corresponding to 1SE}
+\CommentTok{\# lam\_idx\_lasso = which(fit\_lasso$lambda == fit\_lasso$lambda.1se)}
+\CommentTok{\# lam\_idx\_ridge = which(fit\_ridge$lambda == fit\_ridge$lambda.1se)}
+\CommentTok{\# lam\_idx\_enet = which(fit\_enet$lambda == fit\_enet$lambda.1se)}
+
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\CommentTok{\# Part C}
+\DocumentationTok{\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#}
+\NormalTok{yhat\_lasso }\OtherTok{=} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{  fit\_lasso, }
+  \AttributeTok{s=}\NormalTok{fit\_lasso}\SpecialCharTok{$}\NormalTok{lambda}\FloatTok{.1}\NormalTok{se,}
+  \AttributeTok{newx=}\NormalTok{zip\_test }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{()}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{as.numeric}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{sigmoid}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{round}\NormalTok{()}
+
+\NormalTok{yhat\_ridge }\OtherTok{=} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{  fit\_ridge, }
+  \AttributeTok{s=}\NormalTok{fit\_ridge}\SpecialCharTok{$}\NormalTok{lambda}\FloatTok{.1}\NormalTok{se,}
+  \AttributeTok{newx=}\NormalTok{zip\_test }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{()}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{as.numeric}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{sigmoid}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{round}\NormalTok{()}
+
+\NormalTok{yhat\_enet }\OtherTok{=} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{  fit\_enet, }
+  \AttributeTok{s=}\NormalTok{fit\_enet}\SpecialCharTok{$}\NormalTok{lambda}\FloatTok{.1}\NormalTok{se,}
+  \AttributeTok{newx=}\NormalTok{zip\_test }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(X1}\SpecialCharTok{:}\NormalTok{X256) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.matrix}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unname}\NormalTok{()}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{as.numeric}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{sigmoid}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{round}\NormalTok{()}
+
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Lasso Accuracy (Test):"}\NormalTok{, }\FunctionTok{mean}\NormalTok{(yhat\_lasso }\SpecialCharTok{==}\NormalTok{ zip\_test}\SpecialCharTok{$}\NormalTok{y), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Lasso Accuracy (Test): 0.9732143
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Ridge Accuracy (Test):"}\NormalTok{, }\FunctionTok{mean}\NormalTok{(yhat\_ridge}\SpecialCharTok{==}\NormalTok{ zip\_test}\SpecialCharTok{$}\NormalTok{y), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Ridge Accuracy (Test): 0.985119
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"E{-}Net Accuracy (Test):"}\NormalTok{, }\FunctionTok{mean}\NormalTok{(yhat\_enet }\SpecialCharTok{==}\NormalTok{ zip\_test}\SpecialCharTok{$}\NormalTok{y), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## E-Net Accuracy (Test): 0.9821429
+\end{verbatim}
+
+Here, we see that the Ridge model performs best on the test set. This
+may indicate that we want to shrink coefficients for each of the 256
+pixels, instead of eliminating some pixels entirely (as ridge would, and
+potentially E-Net.). Importantly, note that \texttt{standardize=T}
+inside of GLMNET (i.e.~it scales down and then back up at prediction
+time), so mean/centering is taken care of under the hood.
+
+\hypertarget{deeper-lasso-dive}{%
+\subsection{Deeper Lasso Dive}\label{deeper-lasso-dive}}
+
+\hypertarget{section-9}{%
+\subsubsection{1.)}\label{section-9}}
+
+As discussed in class, the \(E\) block contains all of the features that
+have \emph{not} been eliminated/zeroed out by the lasso -- that is, all
+the features that are still alive (hence, active) in the model. All
+features in this block should be zero with probability zero. In
+contrast, the \(-E\) contains all the coefficients that \emph{have} been
+eliminated/zero'd out by the lasso. Here, all features in the inactive
+block are zero (wp 1.)
+
+\hypertarget{section-10}{%
+\subsubsection{2.)}\label{section-10}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{suppressMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(glmnet))}
+\CommentTok{\# FEATURES = c("lcavol", "lweight", "age", "lbph","svi","lcp","gleason","pgg45")}
+\CommentTok{\# }\AlertTok{\#\#\#}\CommentTok{ ESL prostate data}
+\NormalTok{prostate }\OtherTok{=} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"\textasciitilde{}/Stanford/STATS305A/lprostate.csv"}\NormalTok{)}
+\CommentTok{\# X = scale(prostate[FEATURES] \%\textgreater{}\% as.matrix() \%\textgreater{}\% unname())}
+\CommentTok{\# Y = prostate \%\textgreater{}\% pull(lpsa); Y = Y {-} mean(Y)}
+\CommentTok{\# fit = glmnet(X, Y, alpha=1, intercept=F)}
+
+\DocumentationTok{\#\#\# given by HW }\AlertTok{\#\#\#}
+\NormalTok{X }\OtherTok{=} \FunctionTok{model.matrix}\NormalTok{(}\FunctionTok{lm}\NormalTok{(lpsa }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lcavol }\SpecialCharTok{+}\NormalTok{ lweight }\SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ lbph }\SpecialCharTok{+}\NormalTok{ svi }\SpecialCharTok{+}\NormalTok{ lcp }\SpecialCharTok{+}\NormalTok{ gleason }\SpecialCharTok{+}\NormalTok{ pgg45, }\AttributeTok{data=}\NormalTok{prostate))}
+\NormalTok{X }\OtherTok{=} \FunctionTok{scale}\NormalTok{(X, }\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{)[, }\DecValTok{2}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(X)]}
+\NormalTok{Y }\OtherTok{=} \FunctionTok{as.numeric}\NormalTok{(prostate}\SpecialCharTok{$}\NormalTok{lpsa }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(prostate}\SpecialCharTok{$}\NormalTok{lpsa))}
+\NormalTok{G }\OtherTok{=} \FunctionTok{glmnet}\NormalTok{(X, Y, }\AttributeTok{intercept=}\ConstantTok{FALSE}\NormalTok{, }\AttributeTok{standardize=}\ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{beta.hat }\OtherTok{=}  \FunctionTok{coef}\NormalTok{(G, }\AttributeTok{s=}\FloatTok{0.17}\NormalTok{, }\AttributeTok{exact=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{x=}\NormalTok{X, }\AttributeTok{y=}\NormalTok{Y)}
+
+\DocumentationTok{\#\#\# print bhat at this sparsity setting}
+\NormalTok{beta.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 9 x 1 sparse Matrix of class "dgCMatrix"
+##                     1
+## (Intercept) .        
+## lcavol      0.5452621
+## lweight     0.1498760
+## age         .        
+## lbph        .        
+## svi         0.1647422
+## lcp         .        
+## gleason     .        
+## pgg45       .
+\end{verbatim}
+
+As we see, the active block contains \texttt{svi}, \texttt{lcavol}, and
+\texttt{lweight}.
+
+Now recall the KKT conditions, and in particular our construction for
+the desired \(u\). \[
+\partial \underbrace{\lambda ||\hat\beta||_1}_{penalty}
+=
+\begin{cases}
+\lambda sign(\hat\beta_j) & \hat\beta\neq 0\\
+[-\lambda, \lambda] & else
+\end{cases},
+\] i.e. \[
+u \in \partial P(\beta) \iff \beta \in N_{u}(K),
+\] where \(N_{u}(K)\) is the set of normal directions of \(\mu\in K\).
+We can also more succinctly say that
+\(\hat u = \{u: u^T\hat\beta = P(\hat\beta)\}\).
+
+Further, we similarly have as part of KKT \[
+s_j \in \begin{cases}
+sign(\hat\beta_j) & \hat\beta\neq 0\\
+[-1, 1] & else
+\end{cases}
+\] and this is subject to \[
+X^T(y - X\hat\beta) = \lambda \vec s
+\]
+
+However here, we make one modification -- since GLMNET devides the
+squared error term by \(N\), i.e. \[
+L(\beta; Y, X) + P(\beta) = \frac{1}{n}||y - X\beta||_2^2 + \lambda ||\beta||_1,
+\] the modified KKT is in fact \[
+X^T(Y - X\hat\beta) = n\lambda \vec s
+\]
+
+So let's compute the RHS and see what falls out. Note that numeric
+errors preclude recovery of the precise result:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{N }\OtherTok{=} \FunctionTok{dim}\NormalTok{(X)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{LAMBDA }\OtherTok{=} \FloatTok{0.17}
+\NormalTok{beta\_hat }\OtherTok{=} \FunctionTok{as.matrix}\NormalTok{(beta.hat)}
+\CommentTok{\# intercept is zero\textquotesingle{}d, so drop it}
+\NormalTok{beta\_hat }\OtherTok{=}\NormalTok{ beta\_hat[}\DecValTok{2}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(beta\_hat)]}
+\CommentTok{\# LHS}
+\NormalTok{(}\FunctionTok{t}\NormalTok{(X) }\SpecialCharTok{\%*\%}\NormalTok{ Y }\SpecialCharTok{{-}} \FunctionTok{t}\NormalTok{(X) }\SpecialCharTok{\%*\%}\NormalTok{ X }\SpecialCharTok{\%*\%}\NormalTok{ beta\_hat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               [,1]
+## lcavol  16.4881825
+## lweight 16.4896252
+## age      0.1492448
+## lbph    13.4867701
+## svi     16.4900000
+## lcp     12.4563166
+## gleason 12.3711366
+## pgg45   15.3188336
+\end{verbatim}
+
+Ostensibly, this equals \(n\lambda \vec s\), so if we divide the above
+by \(n\lambda\) we should recover \(\hat s\). Indeed:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s\_fit }\OtherTok{=}\NormalTok{ (}\FunctionTok{t}\NormalTok{(X) }\SpecialCharTok{\%*\%}\NormalTok{ Y }\SpecialCharTok{{-}} \FunctionTok{t}\NormalTok{(X) }\SpecialCharTok{\%*\%}\NormalTok{ X }\SpecialCharTok{\%*\%}\NormalTok{ beta\_hat) }\SpecialCharTok{/}\NormalTok{ (LAMBDA }\SpecialCharTok{*}\NormalTok{ N)}
+\NormalTok{s\_true }\OtherTok{=}\NormalTok{ beta\_hat }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{sapply}\NormalTok{(., }\ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{!=} \DecValTok{0}\NormalTok{, }\FunctionTok{sign}\NormalTok{(x), }\StringTok{"[{-}1, 1]"}\NormalTok{)\})}
+
+\FunctionTok{data.frame}\NormalTok{(s\_fit, s\_true)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               s_fit  s_true
+## lcavol  0.999889784       1
+## lweight 0.999977270       1
+## age     0.009050622 [-1, 1]
+## lbph    0.817875687 [-1, 1]
+## svi     1.000000000       1
+## lcp     0.755386088 [-1, 1]
+## gleason 0.750220533 [-1, 1]
+## pgg45   0.928977174 [-1, 1]
+\end{verbatim}
+
+which is quite close to (up to numeric round offs) \(\vec s\). So
+indeed, we satisfy KKT. Note that along the way, we found \[
+\hat u = \lambda \hat s,
+\] assuming the normalizing N is assumed to have been moved to the LHS.
+
+\hypertarget{section-11}{%
+\subsubsection{3.)}\label{section-11}}
+
+Critically, note that
+
+\begin{itemize}
+\item
+  \begin{enumerate}
+  \def\labelenumi{(\roman{enumi})}
+  \tightlist
+  \item
+    our dataset, and thus N, have not changed
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumi{(\roman{enumi})}
+  \setcounter{enumi}{1}
+  \tightlist
+  \item
+    the indices of the non-zero coefficients have not changed; only the
+    coefficent values at those nonzero positions have
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumi{(\roman{enumi})}
+  \setcounter{enumi}{2}
+  \tightlist
+  \item
+    lambda has not changed.
+  \end{enumerate}
+\end{itemize}
+
+Hence, whether under \(\hat \beta\) or \(\hat\beta'\), the new
+coefficients, \(n\lambda\hat s = \hat \u\) will be the same across the
+two of them; there will still be 1's corresponding to the non-zero
+coefficients, and \([-1, 1]\)'s corresponding to the zeroed
+coefficients. We already know that the first fit satisfies KKT, i.e. \[
+X^T(Y - X\hat\beta) = n\lambda \vec s;
+\] the same must be true of the second fit, i.e. \[
+X^T(Y' - X\hat\beta') = n\lambda \vec s
+\] In this second problem, \(Y'\) is the unknown variable for which we
+are trying to solve for. Looking at the above, we immediately have \[
+n\lambda \vec s = X^T(Y - X\hat\beta) = X^T(Y - X\hat\beta)
+\implies 
+(Y' - X\hat\beta') = (Y - X\hat\beta)
+\implies 
+Y' = Y - X(\hat\beta - \hat \beta')
+\] Still, in this second equality, \(Y'\) remains the only unknown. Note
+I played it a bit fast and loose here: we may not always be able to
+cancel off the \(X^T\) term, so this represents but one of the
+infinitely many solutions. In other words, it's guaranteed to work for
+at least this, and most likely more.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# make new B\textquotesingle{}}
+\NormalTok{beta\_hat\_ }\OtherTok{=} \FunctionTok{c}\NormalTok{(.}\DecValTok{6}\NormalTok{, .}\DecValTok{15}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, .}\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\DocumentationTok{\#\#\# solve for the Y}
+\NormalTok{Y\_ }\OtherTok{=}\NormalTok{ Y }\SpecialCharTok{{-}}\NormalTok{ X }\SpecialCharTok{\%*\%}\NormalTok{ (beta\_hat }\SpecialCharTok{{-}}\NormalTok{ beta\_hat\_)}
+
+\NormalTok{G\_ }\OtherTok{=} \FunctionTok{glmnet}\NormalTok{(X, Y\_, }\AttributeTok{intercept=}\ConstantTok{FALSE}\NormalTok{, }\AttributeTok{standardize=}\ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{beta.hat }\OtherTok{=}  \FunctionTok{coef}\NormalTok{(G\_, }\AttributeTok{s=}\FloatTok{0.17}\NormalTok{, }\AttributeTok{exact=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{x=}\NormalTok{X, }\AttributeTok{y=}\NormalTok{Y\_)}
+\NormalTok{beta.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 9 x 1 sparse Matrix of class "dgCMatrix"
+##                     1
+## (Intercept) .        
+## lcavol      0.5999826
+## lweight     0.1500009
+## age         .        
+## lbph        .        
+## svi         0.2000092
+## lcp         .        
+## gleason     .        
+## pgg45       .
+\end{verbatim}
+
+Indeed, we retrieve the original coefficients under this reconstructed
+\(Y'\).
+
+\end{document}
