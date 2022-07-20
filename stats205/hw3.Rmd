@@ -1,0 +1,487 @@
+---
+title: "HW3"
+author: "Isaac Kleisle-Murphy"
+date: "4/30/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+suppressMessages(library(caret))
+```
+
+
+## 5.16.4
+
+```{r}
+motorcycle = read.csv("./data/motorcycle.csv") %>%
+  mutate(idx=row_number())
+motorcycle %>% 
+  head()
+```
+Here, we perform LOO cross validation (`n=94`, so pretty small). According to `stats::loess()`' documentation, the smoothing parameter here is `span`; I assume this is synonymous with $\alpha$ in a tri-cube function? Either way, that's the parameter we'll tune over, with respect to MSE
+```{r}
+
+
+lapply(seq(.1, 2.5, length.out=25), function(span){
+  sapply(1:nrow(motorcycle), function(i){
+    fit = loess(accel ~ times, motorcycle %>% filter(idx != i), span=span);
+    yhat = predict(fit, newdata =motorcycle %>% filter(idx == i))
+    (motorcycle$accel[i] - yhat)^2
+  }) %>%
+    as.numeric() -> mse_loo
+  c(span, mean(mse_loo, na.rm=T))
+}) %>%
+  do.call("rbind", .) %>%
+  data.frame() %>%
+  `colnames<-`(c("span", "mse_loo")) -> cv_result
+
+cv_result %>% arrange(mse_loo) %>% head()
+```
+We select `span=0.4`, and proceed to fit and visualize the tuned model. 
+```{r}
+fit = loess(accel ~ times, data=motorcycle, span=cv_result$span[which.min(cv_result$mse_loo)])
+pred_df = data.frame(times=seq(min(motorcycle$times) + .01, max(motorcycle$times) - .01, length.out=1000))
+pred_df$yhat = predict(fit, newdata=pred_df)
+
+ggplot() +
+  geom_point(data=motorcycle, mapping=aes(x=times, y=accel), color="black") + 
+  geom_path(data=pred_df, mapping=aes(x=times, y=yhat), color="blue")
+```
+
+
+## 5.16.12
+Make the data and CV fn: 
+```{r, cache=TRUE}
+doppler <- function(z){
+  sqrt(z * (1 - z)) * sin((2 * pi)/ (z + .05))
+}
+set.seed(605400)
+N = 1000
+xi = (1:N) / N
+### instantiate data
+y1 = doppler(xi) + .1 * rnorm(N, 0, 1)
+y2 = doppler(xi) + 1 * rnorm(N, 0, 1)
+y3 = doppler(xi) + 3 * rnorm(N, 0, 1)
+
+### make a function to do the CV
+y = y1; x = xi
+
+cv_loess <- function(x, y, lwr_span=.05, upr_span=2.5, length.out=10){
+  lapply(seq(lwr_span, upr_span, length.out=length.out), function(span){
+    cat("-------------\n")
+    N = length(y)
+    sapply(1:N, function(i){
+      # grab all data
+      data_train = data.frame(
+        x=x[(1:N) != i],
+        y=y[(1:N) != i]
+      )
+      data_val = data.frame(
+        x=x[i],
+        y=y[i]
+      )
+      fit = loess(y ~ x, data=data_train, span=span);
+      yhat = predict(fit, newdata=data_val)
+      as.numeric(
+        (y[i] - yhat)^2
+      )
+    })  -> mse_loo
+    c(span, mean(mse_loo, na.rm=T))
+  }) %>%
+    do.call("rbind", .) %>%
+    data.frame() %>%
+    `colnames<-`(c("span", "mse_loo")) -> cv_result
+  cv_result
+}
+```
+
+CV and for the first dataset:
+```{r, cache=T}
+Y = y1
+cv_result = cv_loess(x=xi, y=Y)
+
+## plot MSE
+ggplot(cv_result, aes(x=span, y=mse_loo)) +
+  geom_path() +
+  geom_point() +
+  labs(title="CV Scoring", x="span", y="MSE (LOO)")
+
+## final fit
+fit = loess(Y ~ xi, span=cv_result$span[which.min(cv_result$mse_loo)])
+
+ggplot(
+  data.frame(
+    x=xi, 
+    yhat=predict(fit, xi),
+    y=Y,
+    ci_upr = predict(fit, xi) + 1.96 * predict(fit, xi, se=T)$se.fit,
+    ci_lwr = predict(fit, xi) - 1.96 * predict(fit, xi, se=T)$se.fit
+  ),
+  aes(x=x, y=y)
+) +
+  geom_point(alpha=.5) +
+  geom_path(aes(x=x, y=yhat), color="blue", size=2) +
+  geom_path(aes(x=x, y=ci_upr), color="red")  +
+  geom_path(aes(x=x, y=ci_lwr), color="red")
+
+```
+
+For the second:
+```{r, cache=TRUE}
+Y = y2
+cv_result = cv_loess(x=xi, y=Y)
+
+## plot MSE
+ggplot(cv_result, aes(x=span, y=mse_loo)) +
+  geom_path() +
+  geom_point() +
+  labs(title="CV Scoring", x="span", y="MSE (LOO)")
+
+## final fit
+fit = loess(Y ~ xi, span=cv_result$span[which.min(cv_result$mse_loo)])
+
+ggplot(
+  data.frame(
+    x=xi, 
+    yhat=predict(fit, xi),
+    y=Y,
+    ci_upr = predict(fit, xi) + 1.96 * predict(fit, xi, se=T)$se.fit,
+    ci_lwr = predict(fit, xi) - 1.96 * predict(fit, xi, se=T)$se.fit
+  ),
+  aes(x=x, y=y)
+) +
+  geom_point(alpha=.5) +
+  geom_path(aes(x=x, y=yhat), color="blue", size=2) +
+  geom_path(aes(x=x, y=ci_upr), color="red")  +
+  geom_path(aes(x=x, y=ci_lwr), color="red")
+predict(fit, xi)
+
+```
+
+
+And for the third:
+```{r, cache=TRUE}
+Y = y3
+cv_result = cv_loess(x=xi, y=Y)
+
+## plot MSE
+ggplot(cv_result, aes(x=span, y=mse_loo)) +
+  geom_path() +
+  geom_point() +
+  labs(title="CV Scoring", x="span", y="MSE (LOO)")
+
+## final fit
+fit = loess(Y ~ xi, span=cv_result$span[which.min(cv_result$mse_loo)])
+
+ggplot(
+  data.frame(
+    x=xi, 
+    yhat=predict(fit, xi),
+    y=Y,
+    ci_upr = predict(fit, xi) + 1.96 * predict(fit, xi, se=T)$se.fit,
+    ci_lwr = predict(fit, xi) - 1.96 * predict(fit, xi, se=T)$se.fit
+  ),
+  aes(x=x, y=y)
+) +
+  geom_point(alpha=.5) +
+  geom_path(aes(x=x, y=yhat), color="blue", size=2) +
+  geom_path(aes(x=x, y=ci_upr), color="red")  +
+  geom_path(aes(x=x, y=ci_lwr), color="red")
+
+```
+
+
+## 5.16.15
+For notational convenience, let's change the problem to minimizing $\sum_{i}^N (Y_i - \hat\theta_i) + \ldots$, i.e. using $\hat \mu_i := \hat\theta_i$. We can then treat each row of data as an indicator for being in that row, with $\Theta \in \mathbb{R}^N$ as an OLS-style coefficient, and we will recover the above loss function, i.e.
+$$
+X = I_N
+$$
+and 
+$$
+\Theta = \begin{bmatrix} \theta_1 \\ \theta_2 \\\vdots\\ \theta_N \end{bmatrix}
+$$
+We would then seek to minimize
+$$
+||Y-X\Theta|_2^2 = ||Y-I_N\Theta||_2^2
+$$
+subject to whatever penalty. 
+
+### a.)
+Now, we are minimizing 
+$$
+||Y-I_N\Theta||_2^2 + \lambda ||\Theta||_2^2,
+$$
+which is a ridge regression. Thus, we have
+
+$$
+\hat\Theta = (I^TI + \lambda I)^{-1}I^TY = \frac{1}{1 + \lambda}(Y).
+$$
+
+### b.)
+Now, we minimize
+$$
+||Y-I_N\Theta||_2^2 + \lambda ||\Theta||_1,
+$$
+which we immediately recognize as a Lasso regression. Hence, the coordinate-descent/fixed-point solution for a lasso regression of $Y$ on $I$ subject to $\lambda$ L1 regularization will produce our estimator.
+
+### c.)
+In a general OLS setting, recall that in any OLS setting with coefficients $\theta \in mathbb{R}^D$, we have that $P(\theta_d = 0) = 0$; hence the penalization scheme is trivial, with no penalty incurred, and so the minimization will simply amount to
+
+$$
+\arg\min_{\Theta}||Y - X\Theta||_2^2 + \lambda \sum_{d}\mathbb{1}(\theta_d = 0) =  \arg\min_{\Theta}||Y - X\Theta||_2^2 \implies \hat\Theta = (X^TX)^{-1}X^TY.
+$$
+Hence, in this setting, we will ostensibly have
+$$
+\arg\min_{\Theta}||Y - I_N\Theta||_2^2 \implies \hat\Theta = Y.
+$$
+
+However, there is one catch: if one of the $Y_i$'s equals zero, then a $\hat\theta_d$ will necessarily equal zero, and we will incur some sort of penalty; meanwhile, every other RSS for which $Y_i = \theta_i \neq 0$ will be minimized. As a practical solution, we'll do the following: for all $i: Y_i = 0$, we will assign $\theta_i = \epsilon$ for some very tiny $\epsilon > 0$. This will have the effect of adding minimal RSS penalty on the rows where $Y_i=0$, while allowing all other $Y_i\neq0$ sums-of-squares to remain minimized. Hence, we construct $\hat\Theta$ such that $\hat\theta_i = Y_i + \epsilon \mathbb{1}(Y_i = 0)$ for some sufficiently small (ideally, as small as possible) $\epsilon > 0$. 
+
+## 5.16.22
+Using default configurations for all models
+### i.)
+The MLR fit is:
+```{r}
+airquality_wr = airquality %>%
+  filter(!is.na(Ozone), !is.na(Solar.R), !is.na(Wind), !is.na(Temp))
+
+fit_mlr = lm(Ozone ~ Solar.R + Wind + Temp, data=airquality_wr)
+```
+
+### ii.) 
+The tree-based fit (using default settings):
+```{r}
+fit_tree = rpart::rpart(Ozone ~ Solar.R + Wind + Temp, data=airquality_wr)
+```
+
+### iii.) 
+The MARS fit is:
+```{r}
+fit_mars = earth::earth(Ozone ~ Solar.R + Wind + Temp, data=airquality_wr)
+```
+
+
+### iv.)
+The GAM fit is:
+```{r}
+fit_gam = mgcv::gam(Ozone ~ Solar.R + Wind + Temp, data=airquality_wr)
+```
+
+### v.)
+The PPR fit is
+```{r}
+fit_ppr = ppr(
+  x=as.matrix(airquality_wr[, c("Solar.R", "Wind", "Temp")]),
+  y=airquality_wr$Ozone,
+  nterms=5
+)
+```
+
+
+Then, we re-predict on the training set
+```{r}
+pred_df= airquality_wr # copy
+pred_df$yhat_mlr = predict(fit_mlr, newdata=pred_df)
+pred_df$yhat_tree = predict(fit_tree, newdata=pred_df)
+pred_df$yhat_mars = predict(fit_mars, newdata=pred_df)
+pred_df$yhat_gam = predict(fit_gam, newdata=pred_df)
+pred_df$yhat_ppr = predict(fit_ppr, as.matrix(airquality_wr[, c("Solar.R", "Wind", "Temp")]))
+
+pred_df = pred_df %>% 
+  tidyr::pivot_longer(., cols=c("yhat_mlr", "yhat_tree", "yhat_mars", "yhat_gam", "yhat_ppr", "Ozone"))
+
+ggplot(pred_df, aes(x=Solar.R, y=value, color=name)) +
+  geom_point() +
+  geom_point(
+    data=pred_df %>% filter(name == "Ozone"),
+    mapping=aes(x=Solar.R, y=value),
+    color="black"
+  )
+
+ggplot(pred_df, aes(x=Wind, y=value, color=name)) +
+  geom_point() +
+  geom_point(
+    data=pred_df %>% filter(name == "Ozone"),
+    mapping=aes(x=Wind, y=value),
+    color="black"
+  )
+
+ggplot(pred_df, aes(x=Temp, y=value, color=name)) +
+  geom_point() +
+  geom_point(
+    data=pred_df %>% filter(name == "Ozone"),
+    mapping=aes(x=Temp, y=value),
+    color="black"
+  )
+```
+
+In general, we see that each of the predictions is roughly the same -- they're all generally in the same neighborhood for a given covariate, and generally match the shape/spread/layout of the observed data (in the scatterplot sense). However, there are two things of note -- the PPR is most willing to make "aggressive" predictions, particularly high predictions for ozone. We see a handful of these in the `75 <= Temp <= 90` range / `200 <= Solar.R <= 300` range. Perhaps this is overfit due to a lack of regularization; alternatively, it maybe an inherent preference towards higher variance. Second, we see the GAM underestimate for high wind / low temp datapoints (plots 2/3 in gold). Again, it's hard to make generalizations here, but the behavior does stand out.
+
+
+
+##  6.9.6 
+
+### i.) Densities
+First, we perform LOO CV over kernels and bandwidths. Following from 6.4, we compute the CV estimator of risk. Notably, I cannot get `integrate()` to work over these densities, so I'll just do the first part of $J$ by just taking an area under the density (AUC). I've left in the relevant code however. 
+```{r}
+library(zoo)
+
+x = read.csv("./data/forensic.csv")[, 2] # columns are adjused one over
+N = length(x)
+lapply(seq(1e-3, 5, length.out=50), function(w){
+  lapply(c( # iterate over possibilities
+    "gaussian", "rectangular", "triangular", "epanechnikov", "biweight", "cosine", "optcosine"
+  ), function(ker){
+    #' Compute the holdout loss
+    sapply(1:N, function(i){
+      kde_ = density(x[(1:N) != i], bw=w, kernel=ker);
+      fout = approx(kde_$x, kde_$y, xout=x[i])$y
+    }) %>%
+      mean(., na.rm=T) * 2 -> cv_holdout_loss
+    # compute the full fit
+    kde_full = density(x, bw=w, kernel=ker)
+    
+    ### This won't work ###
+    # squared fhat function to integrate over
+    # fhat_n <- function(z){
+    #   result = (approx(kde_full$x, kde_full$y, xout=z)$y) ^ 2
+    #   # hacky solution
+    #   result = ifelse(is.na(result), 0, result)
+    #   result
+    # }
+    # full_dens = integrate(fhat_n, lower=-10, 20)
+    ###  ###
+    
+    id <- order(x)
+    x_ = (kde_full$x) ^ 2; y_ = (kde_full$y) ^ 2
+    id <- order(x_)
+    AUC <- sum(diff(x_[id]) * rollmean(y_[id],2))
+    data.frame(kernel=ker, bw=w, risk=AUC - cv_holdout_loss)
+  }) %>%
+    do.call("rbind", .)
+}) %>%
+  do.call("rbind", .) -> cv_results
+
+cv_results  %>%
+  arrange(risk) %>% 
+  head(5)
+```
+
+Hence, we choose a `bw=.307` and a Gaussian kernel; we proceed to refit
+```{r}
+kdefit = density(x, bw=.307, kernel="gaussian")
+
+plot(kdefit)
+```
+We see some modality and flexibility in this fit; if we had instead chosen `bw=1` or `bw=2` (dashed) or `bw=3` (dotted) with this Gaussian KDE, we'd have seen something progressively more smooth and unimodal
+```{r}
+plot(density(x, bw=1, kernel="gaussian"))
+lines(density(x, bw=2, kernel="gaussian"), lty="dashed")
+lines(density(x, bw=3, kernel="gaussian"), lty="dotted")
+```
+We can also plot versus rectangular (black), triangular (dashed), and cosine kernels for comparison (all reverting to `bw=.307` here):
+
+```{r}
+plot(density(x, bw=.307, kernel="gaussian"))
+lines(density(x, bw=.307, kernel="triangular"), lty="dashed")
+lines(density(x, bw=.307, kernel="cosine"), lty="dotted")
+```
+Impressively, all come out the same. upon inspection, it looks like an issue with the `kernel` argument in `density()`. For whatever reason, the `kernel` argument doesn't seem to be leveraged within the `stats::density()` function.
+
+
+
+Then, we bootstrap (`S=10000`) under the original settings to get a 95% band:
+```{r}
+xhat = seq(-8, 17, length.out=5000)
+lapply(1:20000, function(i){
+  xi = sample(x, length(x), replace=T)
+  kd = density(xi, bw=.307, kernel="gaussian")
+  yhat = approx(kd$x, kd$y, xout=xhat)$y
+  }
+) %>%
+  do.call("rbind", .) -> boot_result
+
+conf_band = apply(boot_result, 2, quantile, c(.025, .95), na.rm=T) %>% t()
+plot(kdefit)
+lines(xhat, conf_band[, 1], lty="dashed")
+lines(xhat, conf_band[, 2], lty="dashed")
+```
+
+### ii.) Histograms
+Below, we see that the behavior of the histograms (unsurprisingly) mirrors that of the KDE: that is, more buckets/smaller binwidths are like smaller bandwidths, in that they create more multi-model/"erratic" histograms. In contrast, fewer buckets/larger binwidths are like larger bandwidths, insofar as they lump more of the data/neighbors together and create a smoother fit. To see this, consider the histograms for `bin_width=[5, 10, 15, 25, 50]`:
+```{r}
+for (bw in c(5, 10, 15, 25, 50)){
+  hist(
+    x,
+    breaks=seq(min(x), max(x), length.out=bw + 1)
+  )
+}
+```
+
+
+
+## 6.9.10
+
+Function to generate density described in 6.10:
+```{r}
+generate_data <- function(n, random_state=123){
+  #' misread the problem
+  set.seed(random_state)
+  draws = cbind(
+    rnorm(n, 0, 1),
+    rnorm(n, 0/2 - 1, 1/10),
+    rnorm(n, 1/2 - 1, 1/10),
+    rnorm(n, 2/2 - 1, 1/10),
+    rnorm(n, 3/2 - 1, 1/10),
+    rnorm(n, 4/2 - 1, 1/10)
+  )
+  z = sample(1:6, n, replace=T, prob=c(1/2, rep(1/10, 5)))
+  sapply(1:n, function(i) draws[i, z[i]])
+}
+```
+
+We then draw the requisite $n=25, 50, 100, 1,000$ samples:
+```{r}
+s1 = generate_data(25); kde1 = density(s1, bw="nrd0", kernel="gaussian")
+s2 = generate_data(50); kde2 = density(s2, bw="nrd0", kernel="gaussian")
+s3 = generate_data(100); kde3 = density(s3, bw="nrd0", kernel="gaussian")
+s4 = generate_data(1000); kde4 = density(s4, bw="nrd0", kernel="gaussian")
+```
+
+First, for `n=25`, we have:
+```{r}
+plot(kde1)
+kde1
+```
+
+
+Second, for `n=50`, we have:
+```{r}
+plot(kde2)
+kde2
+```
+
+Third, for `n=100`, we have:
+
+```{r}
+plot(kde3)
+kde3
+```
+
+Fourth, for `n=1000`, we have:
+```{r}
+plot(kde4)
+kde4
+```
+
+In general, we see that thethe KDE method (under `bw = nrd0`) tends towards something much smoother, from something much more bell-shaped and fat-tailed. Notably, as `N` increases, we see that density (in geologic terms) begins to take a butte shape (i.e. the smoothed claw) and remains unimodal, suggesting the KDE (with `bw=nrd0`) is not quite ready to divvy up the five spikes. However, when we run with `N=50000`, then that sample size is sufficient for the KDE to reflect the the true multimodality:
+```{r}
+s5 = generate_data(50000); kde5 = density(s5, bw="nrd0", kernel="gaussian")
+plot(kde5)
+kde5
+```
+
+In other words, it appears that the KDE under these settings requires a much higher threshold before going multimodal, in contrast to the regression method.
